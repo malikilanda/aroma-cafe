@@ -3,6 +3,7 @@
    - La table vient du QR code : /?t=5&k=<jeton signé>. Sans QR valide, le menu reste consultable mais pas commandable.
    - Sans serveur (menu en ligne sur Netlify) : simple consultation, rien ne s'affiche en plus.
    - Le panier est gardé sur le téléphone (localStorage) ; les prix affichés sont indicatifs, le serveur recalcule tout.
+   - La table est retenue 3 h au plus, et oubliée dès que la caisse a encaissé la table (fin de la visite).
    - Après l'envoi, le statut de chaque commande est suivi en direct (Reçue → En préparation → Servie).
    ===================================================================== */
 (function () {
@@ -36,12 +37,13 @@
   }
 
   /* ------------------------------------------------------------------ état */
-  let mode = "static"; // static (pas de serveur) | browse (pas de QR) | checking | order | invalid | offline
+  let mode = "static"; // static (pas de serveur) | browse (pas de QR) | checking | order | invalid | offline | done (table réglée)
   let table = null, token = null;
   let cart = [];      // {key, itemId, name, cat, qty, unit, options:{groupId:[choiceId]}, labels:[], note}
   let pendingRef = null; // identifiant d'envoi réutilisé si l'envoi échoue puis est relancé
   let orders = [];    // commandes du jour à cette table
   let billAskedAt = 0;
+  const TABLE_TTL = 3 * 3600e3; // durée max pendant laquelle le téléphone retient sa table après le scan
   const K = () => ({ cart: "aroma.cart." + table, orders: "aroma.orders." + table, bill: "aroma.bill." + table, ref: "aroma.ref." + table });
 
   function save() {
@@ -92,14 +94,16 @@
     const fromUrl = !!(t && k);
     if (!fromUrl) {
       const saved = store.get("aroma.table", null);
-      if (saved && Date.now() - saved.at < 8 * 3600e3) { t = saved.t; k = saved.k; }
+      if (saved && Date.now() - saved.at < TABLE_TTL) { t = saved.t; k = saved.k; }
     }
     if (!(t && k)) { setMode("browse"); return; }
     setMode("checking");
     try {
       await api(`/api/tables/${t}/check?k=${encodeURIComponent(k)}`);
       table = t; token = k;
-      store.set("aroma.table", { t, k, at: Date.now() });
+      store.set("aroma.table", { t, k, at: Date.now() });   // un nouveau scan remplace toujours l'ancien
+      // on retire ?t=…&k=… de l'adresse : recharger la page ne « ressuscite » pas une table oubliée
+      if (fromUrl) history.replaceState(null, "", location.pathname + location.hash);
       cart = store.get(K().cart, []);
       const o = store.get(K().orders, null);
       orders = o && o.day === today() ? o.list : [];
@@ -117,10 +121,11 @@
     mode = m;
     badge.hidden = m === "static";
     badge.className = "tbadge" + (m === "order" ? "" : m === "invalid" || m === "offline" ? " warn" : " off");
-    badge.textContent = m === "order" ? "Table " + table : m === "checking" ? "Connexion…" : m === "invalid" ? "QR code invalide" : m === "offline" ? "Hors connexion" : "Consultation";
+    badge.textContent = m === "order" ? "Table " + table : m === "checking" ? "Connexion…" : m === "invalid" ? "QR code invalide" : m === "offline" ? "Hors connexion" : m === "done" ? "Merci !" : "Consultation";
     banner.hidden = m === "order" || m === "checking" || m === "static";
     if (m === "browse") banner.innerHTML = "<strong>Envie de commander ?</strong>Scannez le QR code posé sur votre table : vous pourrez commander directement depuis ce menu.";
     if (m === "invalid") banner.innerHTML = "<strong>Ce QR code n'est pas reconnu.</strong>Scannez à nouveau le QR code de votre table, ou demandez à un serveur.";
+    if (m === "done") banner.innerHTML = "<strong>Merci de votre visite, à bientôt !</strong>Votre table est réglée. Pour commander à nouveau, scannez le QR code posé sur votre table.";
     if (m === "offline") banner.innerHTML = "<strong>Impossible de joindre le café.</strong>Connectez-vous au Wi-Fi d'Aroma Café, puis rechargez la page.";
     if (typeof rerender === "function") rerender();
     updateBar();
@@ -386,8 +391,10 @@
   function schedulePoll(soon) {
     clearTimeout(pollTimer);
     const live = orders.some((o) => o.status === "NOUVELLE" || o.status === "EN_CUISINE");
-    if (!live) return;
-    pollTimer = setTimeout(refreshOrders, soon ? 3000 : 6000);
+    const served = orders.some((o) => o.status === "SERVIE");   // servie mais pas encore réglée
+    if (!live && !served) return;
+    // en cours : toutes les 6 s ; servie : toutes les 20 s, pour savoir quand la table est encaissée
+    pollTimer = setTimeout(refreshOrders, soon ? 3000 : live ? 6000 : 20000);
   }
   async function refreshOrders() {
     if (mode !== "order" || !orders.length) return;
@@ -405,6 +412,11 @@
         Object.assign(o, v);
       } catch (e) { /* réseau momentané : on réessaie au prochain passage */ }
     }));
+    // la caisse a encaissé la table : fin de la visite, le téléphone oublie la table
+    if (orders.some((o) => o.status === "PAYEE") && orders.every((o) => o.status === "PAYEE" || o.status === "ANNULEE")) {
+      endVisit();
+      return;
+    }
     if (changed) {
       save(); updateBar();
       if (ordersOpen) { const y = $("sheet-body").scrollTop; openOrders(); $("sheet-body").scrollTop = y; }
@@ -412,6 +424,18 @@
     schedulePoll();
   }
   document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshOrders(); });
+
+  /** Fin de la visite : on efface la table, le panier et le suivi de ce téléphone. */
+  function endVisit() {
+    clearTimeout(pollTimer);
+    if (sheetOpen) closeSheet();
+    try { for (const key of Object.values(K())) localStorage.removeItem(key); } catch (e) { /* pas grave */ }
+    store.set("aroma.table", null);
+    cart = []; orders = []; pendingRef = null; billAskedAt = 0;
+    table = null; token = null;
+    setMode("done");
+    toast("Merci de votre visite, à bientôt !");
+  }
 
   /* ------------------------------------------------------------------ démarrage */
   // app.js envoie « menu-pret » quand la carte est chargée (et indique s'il y a un serveur)
