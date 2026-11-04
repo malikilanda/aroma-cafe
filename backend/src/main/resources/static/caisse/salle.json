@@ -1,0 +1,36 @@
+{
+  "_aide": [
+    "Plan de la salle affiché en 3D sur la caisse. Les mesures sont en mètres, vues du dessus.",
+    "x : de gauche (0) à droite (largeur). z : du fond de la salle (0) vers l'entrée (profondeur).",
+    "forme : ronde, carree ou longue. places : nombre de chaises (1 à 8). angle : rotation en degrés (0, 45, 90…).",
+    "Ajouter une table : copier une ligne de « tables », changer le numéro et la position, puis mettre aroma.tables à jour dans application.properties.",
+    "Une table présente dans application.properties mais absente d'ici est placée automatiquement en bas du plan."
+  ],
+
+  "salle": { "largeur": 12, "profondeur": 8 },
+
+  "zones": [
+    { "nom": "Salle",    "x": 0, "z": 0, "largeur": 8, "profondeur": 8, "sol": "bois" },
+    { "nom": "Terrasse", "x": 8, "z": 0, "largeur": 4, "profondeur": 8, "sol": "carrelage" }
+  ],
+
+  "decor": [
+    { "type": "comptoir", "x": 0.6, "z": 0.3, "largeur": 4.2, "profondeur": 0.8, "texte": "Comptoir" },
+    { "type": "entree",   "x": 3.4, "z": 8,   "largeur": 1.6, "texte": "Entrée" },
+    { "type": "plante",   "x": 7.6, "z": 0.5 },
+    { "type": "plante",   "x": 7.6, "z": 7.5 }
+  ],
+
+  "tables": [
+    { "numero": 1,  "x": 1.4, "z": 2.6, "forme": "ronde",  "places": 2 },
+    { "numero": 2,  "x": 3.4, "z": 2.6, "forme": "ronde",  "places": 2 },
+    { "numero": 3,  "x": 5.6, "z": 2.4, "forme": "carree", "places": 4 },
+    { "numero": 4,  "x": 1.4, "z": 4.8, "forme": "carree", "places": 4 },
+    { "numero": 5,  "x": 3.6, "z": 4.8, "forme": "longue", "places": 6 },
+    { "numero": 6,  "x": 6.2, "z": 5.0, "forme": "carree", "places": 4, "angle": 45 },
+    { "numero": 7,  "x": 1.4, "z": 6.9, "forme": "ronde",  "places": 2 },
+    { "numero": 8,  "x": 9.9, "z": 1.6, "forme": "ronde",  "places": 2 },
+    { "numero": 9,  "x": 9.9, "z": 4.0, "forme": "ronde",  "places": 3 },
+    { "numero": 10, "x": 9.9, "z": 6.4, "forme": "longue", "places": 4, "angle": 90 }
+  ]
+}
