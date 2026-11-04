@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1E130D">
+  <title>Aroma Café · Connexion caisse</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&display=swap">
+
+  <style>
+    /* Mêmes couleurs que le menu : crème, brun café, rouge Aroma, ambre */
+    :root {
+      --night: #1E130D;      /* fond de la caisse (plus sombre que le brun du menu) */
+      --paper: #FBF6EF;      /* carte crème */
+      --ink: #2A1A12;        /* texte principal */
+      --soft: #6E5A4B;       /* texte secondaire (contraste 6:1 sur la crème) */
+      --line: #E2D5C6;       /* bordures */
+      --red: #C42230;
+      --brush: #F2A31B;      /* contour de focus */
+      --font: "Jost", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+      color-scheme: light;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 24px max(16px, env(safe-area-inset-right)) 24px max(16px, env(safe-area-inset-left));
+      background: radial-gradient(120% 90% at 50% 0%, #3A251A 0%, var(--night) 60%);
+      color: var(--ink);
+      font: 400 16px/1.5 var(--font);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 400px;
+      background: var(--paper);
+      border-radius: 24px;
+      padding: 32px 28px 28px;
+      box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .55);
+    }
+    .logo { display: block; width: 210px; max-width: 70%; height: auto; margin: 0 auto 6px; }
+    .sub {
+      margin: 0 0 26px;
+      text-align: center;
+      color: var(--soft);
+      font-size: 13px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
+
+    /* Messages (erreur sous le titre, juste au-dessus des champs) */
+    .msg { margin: 0 0 16px; padding: 12px 14px; border-radius: 12px; font-size: 15px; }
+    .msg.err { background: #FBE1DF; color: #8D1B12; }
+    .msg.ok  { background: #E6F2E8; color: #1D5B2A; }
+
+    label { display: block; margin: 0 0 6px; font-weight: 500; font-size: 15px; }
+    .field { position: relative; margin-bottom: 18px; }
+    input {
+      width: 100%;
+      height: 54px;
+      padding: 0 16px;
+      border: 1.5px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 17px;              /* 16px minimum : évite le zoom automatique sur tablette */
+      transition: border-color .15s;
+    }
+    input:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px rgba(242, 163, 27, .45); }
+    input[aria-invalid="true"] { border-color: var(--red); }
+    #password { padding-right: 104px; }
+
+    /* Bouton « Afficher » dans le champ mot de passe (pratique sur un écran tactile) */
+    .peek {
+      position: absolute;
+      right: 6px;
+      bottom: 6px;
+      height: 42px;
+      min-width: 90px;
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--soft);
+      font: 500 14px var(--font);
+      cursor: pointer;
+    }
+    .peek:hover { background: #F3EBE1; color: var(--ink); }
+
+    .go {
+      width: 100%;
+      height: 58px;
+      margin-top: 6px;
+      border: 0;
+      border-radius: 16px;
+      background: var(--ink);
+      color: #F6EEE4;
+      font: 600 17px var(--font);
+      letter-spacing: .02em;
+      cursor: pointer;
+      transition: transform .12s, background .15s;
+    }
+    .go:hover { background: #3A251A; }
+    .go:active { transform: scale(.98); }
+    .go:disabled { opacity: .7; cursor: progress; }
+
+    .peek:focus-visible, .go:focus-visible { outline: 3px solid var(--brush); outline-offset: 2px; }
+
+    .fine { margin: 18px 0 0; text-align: center; color: var(--soft); font-size: 13.5px; }
+
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
+</head>
+<body>
+
+  <!-- Le formulaire est envoyé à Spring Security (POST /login), qui vérifie l'identifiant et le mot de passe -->
+  <form class="card" method="post" action="/login" id="form">
+    <img class="logo" src="/img/logo.png" alt="Aroma Café" width="720" height="140">
+    <p class="sub">Caisse · Commandes à table</p>
+
+    <p class="msg err" id="err" role="alert" hidden>Identifiant ou mot de passe incorrect. Réessayez.</p>
+    <p class="msg ok" id="out" role="status" hidden>Vous êtes déconnecté.</p>
+
+    <div class="field">
+      <label for="username">Identifiant</label>
+      <input id="username" name="username" value="caisse" required
+             autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
+    </div>
+
+    <div class="field">
+      <label for="password">Mot de passe</label>
+      <input id="password" name="password" type="password" required autofocus
+             autocomplete="current-password">
+      <button type="button" class="peek" id="peek" aria-controls="password" aria-pressed="false">Afficher</button>
+    </div>
+
+    <button type="submit" class="go" id="go">Ouvrir la caisse</button>
+
+    <p class="fine">Cette tablette restera connectée 30 jours.</p>
+  </form>
+
+  <script>
+    // Messages renvoyés par Spring : /login.html?erreur ou /login.html?deconnecte
+    const q = new URLSearchParams(location.search);
+    if (q.has("erreur")) {
+      document.getElementById("err").hidden = false;
+      document.getElementById("password").setAttribute("aria-invalid", "true");
+    }
+    if (q.has("deconnecte")) document.getElementById("out").hidden = false;
+
+    // Afficher / masquer le mot de passe
+    const pwd = document.getElementById("password");
+    const peek = document.getElementById("peek");
+    peek.addEventListener("click", () => {
+      const show = pwd.type === "password";
+      pwd.type = show ? "text" : "password";
+      peek.textContent = show ? "Masquer" : "Afficher";
+      peek.setAttribute("aria-pressed", String(show));
+      pwd.focus();
+    });
+
+    // Pendant la vérification : bouton désactivé (évite les doubles appuis)
+    document.getElementById("form").addEventListener("submit", () => {
+      const go = document.getElementById("go");
+      go.disabled = true;
+      go.textContent = "Connexion…";
+    });
+  </script>
+</body>
+</html>
