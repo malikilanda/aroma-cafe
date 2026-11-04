@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1E130D">
+  <title>Aroma Café · Caisse</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap">
+
+  <link rel="stylesheet" href="caisse/caisse.css">
+</head>
+<body>
+
+  <!-- 1. Écran d'accueil : le navigateur n'autorise le son qu'après un premier appui -->
+  <div class="start" id="start">
+    <div class="start-card">
+      <img class="start-logo" src="img/logo.png" alt="Aroma Café" width="720" height="140">
+      <p class="start-sub">Caisse · Commandes à table</p>
+      <button type="button" class="start-btn" id="start-btn">Démarrer le service</button>
+      <p class="start-fine">Active le son des nouvelles commandes.</p>
+    </div>
+  </div>
+
+  <!-- 2. Barre du haut : état de la connexion, compteur, heure, réglages -->
+  <header class="bar">
+    <img class="bar-logo" src="img/logo.png" alt="Aroma Café" width="720" height="140">
+
+    <span class="live" id="live" role="status">
+      <i aria-hidden="true"></i><span id="live-text">Connexion…</span>
+    </span>
+
+    <span class="spacer"></span>
+
+    <span class="count" id="count" hidden>
+      <b id="count-n">0</b><span id="count-label">à traiter</span>
+    </span>
+
+    <time class="clock" id="clock">--:--</time>
+
+    <button type="button" class="bar-btn" id="sound" aria-pressed="true" aria-label="Son des nouvelles commandes">
+      <svg class="ic-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+      <svg class="ic-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="m22 9-6 6M16 9l6 6"/></svg>
+      <span class="bar-btn-l">Son</span>
+    </button>
+
+    <div class="more">
+      <button type="button" class="bar-btn" id="more-btn" aria-haspopup="true" aria-expanded="false" aria-controls="more-menu" aria-label="Plus d'options">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
+      </button>
+      <div class="more-menu" id="more-menu" hidden>
+        <a href="qr.html" target="_blank" rel="noopener">QR codes des tables</a>
+        <button type="button" id="test-sound">Tester le son</button>
+        <form method="post" action="/logout"><button type="submit">Se déconnecter</button></form>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+
+    <!-- 3. La salle en 3D (à gauche) : une pastille par table, rouge = commande à traiter -->
+    <section class="floor" id="floor" aria-label="Plan de la salle">
+      <canvas id="salle" aria-hidden="true"></canvas>
+      <div class="tags" id="tags"></div>
+
+      <ul class="legend" aria-label="Légende">
+        <li><i class="lg lg-new"></i>Nouvelle commande</li>
+        <li><i class="lg lg-busy"></i>Occupée</li>
+        <li><i class="lg lg-bill"></i>Addition demandée</li>
+        <li><i class="lg lg-free"></i>Libre</li>
+      </ul>
+
+      <div class="toasts" id="toasts" aria-live="polite"></div>
+    </section>
+
+    <!-- 4. Le panneau de droite : liste des commandes, ou détail d'une commande / d'une table -->
+    <aside class="side" id="side">
+      <div class="side-list" id="side-list">
+        <div class="seg" role="tablist" aria-label="Commandes">
+          <button type="button" role="tab" id="tab-todo" aria-selected="true">À traiter <span class="seg-n" id="tab-todo-n">0</span></button>
+          <button type="button" role="tab" id="tab-today" aria-selected="false">Aujourd'hui <span class="seg-n" id="tab-today-n">0</span></button>
+        </div>
+        <div class="list" id="list" role="tabpanel"></div>
+      </div>
+
+      <div class="side-detail" id="side-detail" hidden>
+        <button type="button" class="back" id="back">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Retour
+        </button>
+        <div class="detail" id="detail"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- 5. Zone d'impression : remplie par tickets.js juste avant d'imprimer (invisible à l'écran) -->
+  <div id="print"></div>
+
+  <!-- Bibliothèques : Three.js (3D) et STOMP (temps réel) -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+
+  <!-- Nos fichiers : les tickets, la salle 3D, puis la caisse qui relie tout -->
+  <script src="caisse/tickets.js"></script>
+  <script src="caisse/salle3d.js"></script>
+  <script src="caisse/caisse.js"></script>
+</body>
+</html>
