@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FBF6EF">
+  <meta name="description" content="Menu d'Aroma Café, coffee house : cafés, boissons glacées, smoothies, plats et desserts.">
+  <title>Aroma Café · Menu</title>
+
+  <!-- Polices : Allura (titres manuscrits) et Jost (texte) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Allura&family=Jost:wght@400;500;600&display=swap">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- En-tête : logo (img/logo.png, recoloré en crème par le CSS sur la partie Cuisine) -->
+  <header class="top wrap">
+    <img class="logo" src="img/logo.png" alt="Aroma Café, coffee house" width="720" height="140">
+  </header>
+
+  <!-- Onglets des catégories : remplis par js/app.js -->
+  <nav class="tabs" aria-label="Catégories">
+    <div class="tabs-scroll" id="tabs" role="tablist"></div>
+  </nav>
+
+  <main class="wrap">
+    <!-- Scène 3D : le produit de la catégorie, dessiné par js/scene3d.js -->
+    <div class="stage" id="stage">
+      <canvas id="gl" aria-label="Produit en 3D, glissez pour le faire tourner"></canvas>
+      <div class="hint" id="hint">Glissez pour tourner</div>
+    </div>
+
+    <!-- Contenu de la catégorie choisie -->
+    <section id="panel" role="tabpanel" aria-live="polite">
+      <div class="cat-head">
+        <h2 class="cat-title" id="title"></h2>
+        <div class="cat-meta" id="meta"></div>
+      </div>
+      <p class="note" id="note" hidden></p>
+      <ul class="items" id="items"></ul>
+      <div id="extras"></div>
+    </section>
+
+    <!-- Catégorie précédente / suivante -->
+    <div class="pager">
+      <button class="navbtn prev" id="prev" type="button"><small>Précédent</small><span></span></button>
+      <button class="navbtn next" id="next" type="button"><small>Suivant</small><span></span></button>
+    </div>
+  </main>
+
+  <footer class="wrap">Prix en francs CFA</footer>
+
+  <!-- Bibliothèques : Three.js (3D) et GSAP (animations) -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <!-- Nos fichiers, dans cet ordre : les données, l'interface, puis la 3D -->
+  <script src="js/menu-data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/scene3d.js"></script>
+</body>
+</html>
