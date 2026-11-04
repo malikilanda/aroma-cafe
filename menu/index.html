@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Allura&family=Jost:wght@400;500;600&display=swap">
 
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/commande.css">
 </head>
 <body>
 
@@ -51,15 +52,19 @@
     </div>
   </main>
 
-  <footer class="wrap">Prix en francs CFA</footer>
+  <footer class="wrap" id="foot">Prix en francs CFA</footer>
+
+  <!-- Panier, fiche produit, suivi : remplis par js/commande.js -->
+  <div id="commande-root"></div>
 
   <!-- Bibliothèques : Three.js (3D) et GSAP (animations) -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
-  <!-- Nos fichiers, dans cet ordre : les données, l'interface, puis la 3D -->
+  <!-- Nos fichiers, dans cet ordre : la carte de secours, l'interface, la 3D, puis la commande -->
   <script src="js/menu-data.js"></script>
   <script src="js/app.js"></script>
   <script src="js/scene3d.js"></script>
+  <script src="js/commande.js"></script>
 </body>
 </html>
