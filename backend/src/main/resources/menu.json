@@ -1,0 +1,1885 @@
+{
+  "currency": "F",
+  "categories": [
+    {
+      "id": "cafe-chaud",
+      "group": "Boissons",
+      "title": "Café chaud",
+      "model": "cup",
+      "note": null,
+      "options": [
+        {
+          "id": "lait",
+          "label": "Lait végétal",
+          "type": "single",
+          "required": false,
+          "choices": [
+            {
+              "id": "lait-d-amande",
+              "label": "Lait d'amande",
+              "price": 500
+            },
+            {
+              "id": "lait-de-coco",
+              "label": "Lait de coco",
+              "price": 500
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "id": "cafe-chaud--cafe-latte",
+          "name": "Café latte",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "cafe-chaud--cafe-latte-vanille",
+          "name": "Café latte vanille",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-chaud--cafe-cappuccino",
+          "name": "Café cappuccino",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-chaud--cafe-latte-caramel",
+          "name": "Café latte caramel",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-chaud--cafe-latte-noisette",
+          "name": "Café latte noisette",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-chaud--cafe-mocha",
+          "name": "Café mocha",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-chaud--cafe-mocha-blanc",
+          "name": "Café mocha blanc",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-chaud--cafe-libanais",
+          "name": "Café libanais",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "cafe-chaud--latte-matcha",
+          "name": "Latte matcha",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-chaud--chocolat-chaud",
+          "name": "Chocolat chaud",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "cafe-chaud--the-compose",
+          "name": "Thé composé",
+          "price": 1500,
+          "sub": null
+        },
+        {
+          "id": "cafe-chaud--the-chaud",
+          "name": "Thé chaud",
+          "price": 1000,
+          "sub": null
+        },
+        {
+          "id": "cafe-chaud--cafe-espresso",
+          "name": "Café espresso",
+          "price": 1000,
+          "sub": null
+        },
+        {
+          "id": "cafe-chaud--cafe-espresso-double",
+          "name": "Café espresso double",
+          "price": 1500,
+          "sub": null
+        },
+        {
+          "id": "cafe-chaud--cafe-machiato",
+          "name": "Café machiato",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "cafe-chaud--cafe-cortado",
+          "name": "Café cortado",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "cafe-chaud--cafe-americain",
+          "name": "Café américain",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "cafe-chaud--cafe-americano-chaud",
+          "name": "Café americano chaud",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "cafe-chaud--cappuccino",
+          "name": "Cappuccino",
+          "price": 3000,
+          "sub": null
+        }
+      ],
+      "extras": [
+        {
+          "title": "Suppléments",
+          "items": [
+            {
+              "name": "Lait d'amande / lait de coco",
+              "price": 500
+            }
+          ]
+        }
+      ],
+      "chips": null
+    },
+    {
+      "id": "cafe-glace",
+      "group": "Boissons",
+      "title": "Café glacé",
+      "model": "icedLatte",
+      "note": null,
+      "options": [],
+      "items": [
+        {
+          "id": "cafe-glace--cafe-latte-glace",
+          "name": "Café latte glacé",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "cafe-glace--cafe-latte-caramel-glace",
+          "name": "Café latte caramel glacé",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-glace--cafe-latte-noisette-glace",
+          "name": "Café latte noisette glacé",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-glace--cafe-latte-cappuccino-glace",
+          "name": "Café latte cappuccino glacé",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-glace--cafe-latte-vanille-glace",
+          "name": "Café latte vanille glacé",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-glace--cafe-caramel-sale-glace",
+          "name": "Café caramel salé glacé",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-glace--cafe-latte-oreo-glace",
+          "name": "Café latte Oreo glacé",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-glace--cafe-latte-lotus-glace",
+          "name": "Café latte Lotus glacé",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-glace--cafe-latte-nutella-glace",
+          "name": "Café latte Nutella glacé",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-glace--cafe-latte-cookies-glace",
+          "name": "Café latte cookies glacé",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-glace--cafe-matcha-glace",
+          "name": "Café matcha glacé",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-glace--cafe-mocha-glace",
+          "name": "Café mocha glacé",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-glace--cafe-mocha-blanc-glace",
+          "name": "Café mocha blanc glacé",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-glace--cafe-americain-glace",
+          "name": "Café américain glacé",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "cafe-glace--cafe-americano-glace",
+          "name": "Café americano glacé",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "cafe-glace--cafe-latte-cannelle-glace",
+          "name": "Café latte cannelle glacé",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "cafe-glace--latte-matcha-glace",
+          "name": "Latte matcha glacé",
+          "price": 3500,
+          "sub": null
+        }
+      ],
+      "extras": [],
+      "chips": null
+    },
+    {
+      "id": "mocha-frappe",
+      "group": "Boissons",
+      "title": "Mocha frappé",
+      "model": "mocha",
+      "note": null,
+      "options": [],
+      "items": [
+        {
+          "id": "mocha-frappe--mocha-frappe",
+          "name": "Mocha frappé",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "mocha-frappe--mocha-frappe-blanc",
+          "name": "Mocha frappé blanc",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "mocha-frappe--mocha-frappe-chocolat",
+          "name": "Mocha frappé chocolat",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "mocha-frappe--mocha-frappe-caramel",
+          "name": "Mocha frappé caramel",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "mocha-frappe--mocha-frappe-nutella",
+          "name": "Mocha frappé Nutella",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "mocha-frappe--mocha-frappe-twix",
+          "name": "Mocha frappé Twix",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "mocha-frappe--mocha-frappe-snickers",
+          "name": "Mocha frappé Snickers",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "mocha-frappe--mocha-frappe-kitkat",
+          "name": "Mocha frappé KitKat",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "mocha-frappe--mocha-frappe-lotus",
+          "name": "Mocha frappé Lotus",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "mocha-frappe--mocha-frappe-oreo",
+          "name": "Mocha frappé Oreo",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "mocha-frappe--mocha-frappe-cookies",
+          "name": "Mocha frappé cookies",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "mocha-frappe--mocha-frappe-espresso",
+          "name": "Mocha frappé espresso",
+          "price": 4000,
+          "sub": null
+        }
+      ],
+      "extras": [],
+      "chips": null
+    },
+    {
+      "id": "milk-shake",
+      "group": "Boissons",
+      "title": "Milk shake",
+      "model": "shake",
+      "note": null,
+      "options": [],
+      "items": [
+        {
+          "id": "milk-shake--milk-shake-vanille",
+          "name": "Milk shake vanille",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "milk-shake--milk-shake-chocolat",
+          "name": "Milk shake chocolat",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "milk-shake--milk-shake-mangue",
+          "name": "Milk shake mangue",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "milk-shake--milk-shake-papaya",
+          "name": "Milk shake papaya",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "milk-shake--milk-shake-caramel",
+          "name": "Milk shake caramel",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "milk-shake--milk-shake-oreo",
+          "name": "Milk shake Oreo",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "milk-shake--milk-shake-nutella",
+          "name": "Milk shake Nutella",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "milk-shake--milk-shake-kitkat",
+          "name": "Milk shake KitKat",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "milk-shake--milk-shake-lotus",
+          "name": "Milk shake Lotus",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "milk-shake--milk-shake-fraise",
+          "name": "Milk shake fraise",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "milk-shake--milk-shake-framboise",
+          "name": "Milk shake framboise",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "milk-shake--milk-shake-fruit-rouge",
+          "name": "Milk shake fruit rouge",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "milk-shake--milk-shake-myrtille",
+          "name": "Milk shake myrtille",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "milk-shake--milk-shake-snickers",
+          "name": "Milk shake Snickers",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "milk-shake--milk-shake-beurre-d-arachide",
+          "name": "Milk shake beurre d'arachide",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "milk-shake--milk-shake-matcha",
+          "name": "Milk shake matcha",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "milk-shake--milk-shake-dragon",
+          "name": "Milk shake dragon",
+          "price": 3500,
+          "sub": null
+        }
+      ],
+      "extras": [],
+      "chips": null
+    },
+    {
+      "id": "bubble-tea",
+      "group": "Boissons",
+      "title": "Bubble Tea",
+      "model": "boba",
+      "note": null,
+      "options": [],
+      "items": [
+        {
+          "id": "bubble-tea--the-au-lait",
+          "name": "Thé au lait",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "bubble-tea--the-au-lait-bubble-caramel",
+          "name": "Thé au lait bubble caramel",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "bubble-tea--the-au-lait-bubble-chocolat",
+          "name": "Thé au lait bubble chocolat",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "bubble-tea--the-au-lait-bubble-vanille",
+          "name": "Thé au lait bubble vanille",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "bubble-tea--the-au-lait-bubble-fraise",
+          "name": "Thé au lait bubble fraise",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "bubble-tea--the-au-lait-bubble-framboise",
+          "name": "Thé au lait bubble framboise",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "bubble-tea--the-au-lait-bubble-myrtille",
+          "name": "Thé au lait bubble myrtille",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "bubble-tea--the-bubble-passion",
+          "name": "Thé bubble passion",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "bubble-tea--the-bubble-citron",
+          "name": "Thé bubble citron",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "bubble-tea--the-bubble-fruit-du-dragon",
+          "name": "Thé bubble fruit du dragon",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "bubble-tea--the-bubble-mangue-passion",
+          "name": "Thé bubble mangue / passion",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "bubble-tea--the-bubble-menthe-passion",
+          "name": "Thé bubble menthe / passion",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "bubble-tea--the-au-lait-bubble-matcha",
+          "name": "Thé au lait bubble matcha",
+          "price": 4000,
+          "sub": null
+        }
+      ],
+      "extras": [],
+      "chips": null
+    },
+    {
+      "id": "aroma-speciale",
+      "group": "Boissons",
+      "title": "Aroma Spéciale",
+      "model": "brand",
+      "note": "Vous pouvez ajouter la saveur boba de votre choix aux différentes boissons.",
+      "options": [
+        {
+          "id": "boba",
+          "label": "Saveur boba",
+          "type": "single",
+          "required": false,
+          "choices": [
+            {
+              "id": "framboise",
+              "label": "Framboise",
+              "price": 0
+            },
+            {
+              "id": "peche",
+              "label": "Pêche",
+              "price": 0
+            },
+            {
+              "id": "chocolat",
+              "label": "Chocolat",
+              "price": 0
+            },
+            {
+              "id": "passion",
+              "label": "Passion",
+              "price": 0
+            },
+            {
+              "id": "fraise",
+              "label": "Fraise",
+              "price": 0
+            },
+            {
+              "id": "pomme",
+              "label": "Pomme",
+              "price": 0
+            },
+            {
+              "id": "mangue",
+              "label": "Mangue",
+              "price": 0
+            },
+            {
+              "id": "fruit-du-dragon",
+              "label": "Fruit du dragon",
+              "price": 0
+            },
+            {
+              "id": "kiwi",
+              "label": "Kiwi",
+              "price": 0
+            },
+            {
+              "id": "raisin",
+              "label": "Raisin",
+              "price": 0
+            },
+            {
+              "id": "litchi",
+              "label": "Litchi",
+              "price": 0
+            },
+            {
+              "id": "myrtille",
+              "label": "Myrtille",
+              "price": 0
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "id": "aroma-speciale--aroma-yaourt-mangue",
+          "name": "Aroma yaourt mangue",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "aroma-speciale--aroma-dalgona-cafe",
+          "name": "Aroma dalgona café",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "aroma-speciale--aroma-smoothie-mangue-dragon",
+          "name": "Aroma smoothie mangue dragon",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "aroma-speciale--aroma-smoothie-mangue-framboise",
+          "name": "Aroma smoothie mangue framboise",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "aroma-speciale--aroma-smoothie-mangue-fraise",
+          "name": "Aroma smoothie mangue fraise",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "aroma-speciale--aroma-smoothie-mangue-orange",
+          "name": "Aroma smoothie mangue orange",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "aroma-speciale--aroma-brownie-blende",
+          "name": "Aroma brownie blendé",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "aroma-speciale--aroma-choco-noir-menthe-blende",
+          "name": "Aroma choco-noir menthe blendé",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "aroma-speciale--salade-de-fruit",
+          "name": "Salade de fruit",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "aroma-speciale--aroma-salade-fruit",
+          "name": "Aroma salade fruit",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "aroma-speciale--aroma-pina-colada",
+          "name": "Aroma piña colada",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "aroma-speciale--aroma-choco-banane",
+          "name": "Aroma choco-banane",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "aroma-speciale--aroma-red-bull",
+          "name": "Aroma Red Bull",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "aroma-speciale--aroma-choco-blanc-fraise",
+          "name": "Aroma choco blanc fraise",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "aroma-speciale--aroma-limonade-passion",
+          "name": "Aroma limonade passion",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "aroma-speciale--aroma-choco-noir-framboise-blende",
+          "name": "Aroma choco noir framboise blendé",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "aroma-speciale--aroma-choco-noir-orange-blende",
+          "name": "Aroma choco noir orange blendé",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "aroma-speciale--aroma-ananas-passion",
+          "name": "Aroma ananas-passion",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "aroma-speciale--aroma-ananas-passion-menthe",
+          "name": "Aroma ananas passion menthe",
+          "price": 4000,
+          "sub": null
+        }
+      ],
+      "extras": [],
+      "chips": {
+        "title": "Saveurs boba",
+        "list": [
+          "Framboise",
+          "Pêche",
+          "Chocolat",
+          "Passion",
+          "Fraise",
+          "Pomme",
+          "Mangue",
+          "Fruit du dragon",
+          "Kiwi",
+          "Raisin",
+          "Litchi",
+          "Myrtille"
+        ]
+      }
+    },
+    {
+      "id": "smoothie",
+      "group": "Boissons",
+      "title": "Smoothie",
+      "model": "smoothie",
+      "note": null,
+      "options": [],
+      "items": [
+        {
+          "id": "smoothie--smoothie-mangue",
+          "name": "Smoothie mangue",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "smoothie--smoothie-papaya",
+          "name": "Smoothie papaya",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "smoothie--smoothie-ananas",
+          "name": "Smoothie ananas",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "smoothie--smoothie-pasteque",
+          "name": "Smoothie pastèque",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "smoothie--smoothie-passion",
+          "name": "Smoothie passion",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "smoothie--smoothie-mojito",
+          "name": "Smoothie mojito",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "smoothie--smoothie-mangue-passion",
+          "name": "Smoothie mangue / passion",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "smoothie--smoothie-mangue-passion-menthe",
+          "name": "Smoothie mangue / passion / menthe",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "smoothie--smoothie-fraise",
+          "name": "Smoothie fraise",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "smoothie--smoothie-framboise",
+          "name": "Smoothie framboise",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "smoothie--smoothie-fruit-rouge",
+          "name": "Smoothie fruit rouge",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "smoothie--smoothie-myrtille",
+          "name": "Smoothie myrtille",
+          "price": 3000,
+          "sub": null
+        }
+      ],
+      "extras": [],
+      "chips": null
+    },
+    {
+      "id": "jus-naturels",
+      "group": "Boissons",
+      "title": "Jus naturels",
+      "model": "juice",
+      "note": null,
+      "options": [],
+      "items": [
+        {
+          "id": "jus-naturels--jus-orange",
+          "name": "Jus orange",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "jus-naturels--jus-mangue",
+          "name": "Jus mangue",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "jus-naturels--jus-ananas",
+          "name": "Jus ananas",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "jus-naturels--jus-goyave",
+          "name": "Jus goyave",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "jus-naturels--jus-de-baobab",
+          "name": "Jus de baobab",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "jus-naturels--jus-bissap",
+          "name": "Jus bissap",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "jus-naturels--jus-corossol",
+          "name": "Jus corossol",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "jus-naturels--jus-clementine",
+          "name": "Jus clémentine",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "jus-naturels--jus-passion",
+          "name": "Jus passion",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "jus-naturels--jus-orange-ananas",
+          "name": "Jus orange / ananas",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "jus-naturels--jus-passion-ananas",
+          "name": "Jus passion / ananas",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "jus-naturels--jus-passion-orange",
+          "name": "Jus passion / orange",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "jus-naturels--jus-bissap-ananas-menthe",
+          "name": "Jus bissap / ananas / menthe",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "jus-naturels--jus-bissap-citron-menthe",
+          "name": "Jus bissap / citron / menthe",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "jus-naturels--jus-ananas-gingembre",
+          "name": "Jus ananas / gingembre",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "jus-naturels--jus-bissap-ananas-gingembre",
+          "name": "Jus bissap / ananas / gingembre",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "jus-naturels--jus-ananas-orange-gingembre-menthe",
+          "name": "Jus ananas / orange / gingembre / menthe",
+          "price": 2000,
+          "sub": null
+        }
+      ],
+      "extras": [],
+      "chips": null
+    },
+    {
+      "id": "the-glace",
+      "group": "Boissons",
+      "title": "Thé glacé",
+      "model": "icedTea",
+      "note": null,
+      "options": [],
+      "items": [
+        {
+          "id": "the-glace--the-glace-peche",
+          "name": "Thé glacé pêche",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "the-glace--the-glace-citron",
+          "name": "Thé glacé citron",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "the-glace--the-glace-fraise",
+          "name": "Thé glacé fraise",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "the-glace--the-glace-myrtille",
+          "name": "Thé glacé myrtille",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "the-glace--the-glace-framboise",
+          "name": "Thé glacé framboise",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "the-glace--the-glace-citron-menthe",
+          "name": "Thé glacé citron / menthe",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "the-glace--the-glace-citron-passion",
+          "name": "Thé glacé citron / passion",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "the-glace--the-glace-mangue-passion",
+          "name": "Thé glacé mangue / passion",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "the-glace--the-glace-menthe-passion",
+          "name": "Thé glacé menthe / passion",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "the-glace--the-glace-passion",
+          "name": "Thé glacé passion",
+          "price": 2500,
+          "sub": null
+        }
+      ],
+      "extras": [],
+      "chips": null
+    },
+    {
+      "id": "cocktail-gazeux",
+      "group": "Boissons",
+      "title": "Cocktail gazeux",
+      "model": "soda",
+      "note": null,
+      "options": [],
+      "items": [
+        {
+          "id": "cocktail-gazeux--sprite-passion",
+          "name": "Sprite + passion",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "cocktail-gazeux--sprite-passion-fraise",
+          "name": "Sprite + passion + fraise",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "cocktail-gazeux--sprite-passion-citron",
+          "name": "Sprite + passion + citron",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "cocktail-gazeux--sprite-chewing-gum",
+          "name": "Sprite + chewing-gum",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "cocktail-gazeux--sprite-fraise",
+          "name": "Sprite + fraise",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "cocktail-gazeux--sprite-myrtille",
+          "name": "Sprite + myrtille",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "cocktail-gazeux--sprite-fruit-rouge",
+          "name": "Sprite + fruit rouge",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "cocktail-gazeux--sprite-framboise",
+          "name": "Sprite + framboise",
+          "price": 2000,
+          "sub": null
+        }
+      ],
+      "extras": [],
+      "chips": null
+    },
+    {
+      "id": "sucrerie",
+      "group": "Boissons",
+      "title": "Sucrerie",
+      "model": "can",
+      "note": null,
+      "options": [],
+      "items": [
+        {
+          "id": "sucrerie--coca",
+          "name": "Coca",
+          "price": 1000,
+          "sub": null
+        },
+        {
+          "id": "sucrerie--fanta",
+          "name": "Fanta",
+          "price": 1000,
+          "sub": null
+        },
+        {
+          "id": "sucrerie--malta",
+          "name": "Malta",
+          "price": 1000,
+          "sub": null
+        },
+        {
+          "id": "sucrerie--sprite",
+          "name": "Sprite",
+          "price": 1000,
+          "sub": null
+        },
+        {
+          "id": "sucrerie--cocktail",
+          "name": "Cocktail",
+          "price": 1000,
+          "sub": null
+        },
+        {
+          "id": "sucrerie--red-bull",
+          "name": "Red Bull",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "sucrerie--eau-gazeuse",
+          "name": "Eau gazeuse",
+          "price": 1500,
+          "sub": null
+        },
+        {
+          "id": "sucrerie--eau-minerale",
+          "name": "Eau minérale",
+          "price": 0,
+          "sub": null,
+          "options": [
+            {
+              "id": "format",
+              "label": "Format",
+              "type": "single",
+              "required": true,
+              "choices": [
+                {
+                  "id": "0-5-l",
+                  "label": "0,5 L",
+                  "price": 500
+                },
+                {
+                  "id": "1-5-l",
+                  "label": "1,5 L",
+                  "price": 1500
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "extras": [],
+      "chips": null
+    },
+    {
+      "id": "glace",
+      "group": "Boissons",
+      "title": "Glace",
+      "model": "iceCream",
+      "note": null,
+      "options": [
+        {
+          "id": "sauce",
+          "label": "Sauces",
+          "type": "multi",
+          "required": false,
+          "choices": [
+            {
+              "id": "sauce-framboise",
+              "label": "Sauce framboise",
+              "price": 1000
+            },
+            {
+              "id": "sauce-fraise",
+              "label": "Sauce fraise",
+              "price": 1000
+            },
+            {
+              "id": "sauce-myrtille",
+              "label": "Sauce myrtille",
+              "price": 1000
+            },
+            {
+              "id": "sauce-chocolat-noir",
+              "label": "Sauce chocolat noir",
+              "price": 1000
+            },
+            {
+              "id": "sauce-caramel",
+              "label": "Sauce caramel",
+              "price": 1000
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "id": "glace--chocolat",
+          "name": "Chocolat",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "glace--vanille",
+          "name": "Vanille",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "glace--chocolat-vanille",
+          "name": "Chocolat vanille",
+          "price": 2000,
+          "sub": null
+        }
+      ],
+      "extras": [
+        {
+          "title": "Supplément sauce",
+          "items": [
+            {
+              "name": "Sauce framboise",
+              "price": 1000
+            },
+            {
+              "name": "Sauce fraise",
+              "price": 1000
+            },
+            {
+              "name": "Sauce myrtille",
+              "price": 1000
+            },
+            {
+              "name": "Sauce chocolat noir",
+              "price": 1000
+            },
+            {
+              "name": "Sauce caramel",
+              "price": 1000
+            }
+          ]
+        }
+      ],
+      "chips": null
+    },
+    {
+      "id": "petit-dejeuner",
+      "group": "Cuisine",
+      "title": "Petit déjeuner",
+      "model": "brand",
+      "note": null,
+      "options": [],
+      "items": [
+        {
+          "id": "petit-dejeuner--croque-monsieur",
+          "name": "Croque monsieur",
+          "price": 1500,
+          "sub": null
+        },
+        {
+          "id": "petit-dejeuner--croque-madame",
+          "name": "Croque madame",
+          "price": 2000,
+          "sub": null
+        },
+        {
+          "id": "petit-dejeuner--pancake",
+          "name": "Pancake",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "petit-dejeuner--pancake-chocolat",
+          "name": "Pancake chocolat",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "petit-dejeuner--omelette-jf-avec-pain",
+          "name": "Omelette JF avec pain",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "petit-dejeuner--omelette-avec-pain",
+          "name": "Omelette avec pain",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "petit-dejeuner--oeuf-au-plat",
+          "name": "Œuf au plat",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "petit-dejeuner--oeuf-poche",
+          "name": "Œuf poché",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "petit-dejeuner--sandwich-jambon",
+          "name": "Sandwich jambon",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "petit-dejeuner--croissant",
+          "name": "Croissant",
+          "price": 1000,
+          "sub": null
+        },
+        {
+          "id": "petit-dejeuner--pain-raisin",
+          "name": "Pain raisin",
+          "price": 1500,
+          "sub": null
+        },
+        {
+          "id": "petit-dejeuner--pain-chocolat",
+          "name": "Pain chocolat",
+          "price": 1500,
+          "sub": null
+        }
+      ],
+      "extras": [],
+      "chips": null
+    },
+    {
+      "id": "fastfood",
+      "group": "Cuisine",
+      "title": "Fastfood",
+      "model": "burger",
+      "note": null,
+      "options": [],
+      "items": [
+        {
+          "id": "fastfood--burger-boeuf",
+          "name": "Burger bœuf",
+          "price": 3000,
+          "sub": "Frites + salade de chou"
+        },
+        {
+          "id": "fastfood--cheeseburger",
+          "name": "Cheeseburger",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "fastfood--burger-oeuf",
+          "name": "Burger œuf",
+          "price": 3500,
+          "sub": "Frites + salade de chou"
+        },
+        {
+          "id": "fastfood--burger-oeuf-fromage",
+          "name": "Burger œuf + fromage",
+          "price": 4000,
+          "sub": "Frites + salade de chou"
+        },
+        {
+          "id": "fastfood--burger-royale",
+          "name": "Burger royale",
+          "price": 4500,
+          "sub": "Frites + salade de chou"
+        },
+        {
+          "id": "fastfood--chicken-burger",
+          "name": "Chicken burger",
+          "price": 3500,
+          "sub": "Frites + salade de chou"
+        },
+        {
+          "id": "fastfood--cheese-chicken-burger",
+          "name": "Cheese chicken burger",
+          "price": 4000,
+          "sub": "Frites + salade de chou"
+        },
+        {
+          "id": "fastfood--fahita",
+          "name": "Fahita",
+          "price": 3500,
+          "sub": "Frites"
+        },
+        {
+          "id": "fastfood--arabica",
+          "name": "Arabica",
+          "price": 3500,
+          "sub": "Frites"
+        }
+      ],
+      "extras": [],
+      "chips": null
+    },
+    {
+      "id": "sandwich",
+      "group": "Cuisine",
+      "title": "Sandwich",
+      "model": "brand",
+      "note": null,
+      "options": [],
+      "items": [
+        {
+          "id": "sandwich--shawarma-viande",
+          "name": "Shawarma viande",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "sandwich--shawarma-poulet",
+          "name": "Shawarma poulet",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "sandwich--philadelphia",
+          "name": "Philadelphia",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "sandwich--sandwich-saucisse",
+          "name": "Sandwich saucisse",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "sandwich--sandwich-viande-hachee",
+          "name": "Sandwich viande hachée",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "sandwich--sandwich-crispy",
+          "name": "Sandwich crispy",
+          "price": 3500,
+          "sub": "Crème ail"
+        },
+        {
+          "id": "sandwich--sandwich-escalope",
+          "name": "Sandwich escalope",
+          "price": 3500,
+          "sub": "Fromage cheddar"
+        }
+      ],
+      "extras": [],
+      "chips": null
+    },
+    {
+      "id": "entree",
+      "group": "Cuisine",
+      "title": "Entrée",
+      "model": "brand",
+      "note": null,
+      "options": [],
+      "items": [
+        {
+          "id": "entree--salade-cesar",
+          "name": "Salade César",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "entree--salade-verte",
+          "name": "Salade verte",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "entree--saucisse-sautee",
+          "name": "Saucisse sautée",
+          "price": 2000,
+          "sub": null
+        }
+      ],
+      "extras": [],
+      "chips": null
+    },
+    {
+      "id": "plat",
+      "group": "Cuisine",
+      "title": "Plat",
+      "model": "brand",
+      "note": null,
+      "options": [],
+      "items": [
+        {
+          "id": "plat--plat-crispy",
+          "name": "Plat crispy",
+          "price": 4500,
+          "sub": "Riz jaune / fried rice",
+          "options": [
+            {
+              "id": "accompagnement",
+              "label": "Accompagnement",
+              "type": "single",
+              "required": true,
+              "choices": [
+                {
+                  "id": "riz-jaune",
+                  "label": "Riz jaune",
+                  "price": 0
+                },
+                {
+                  "id": "fried-rice",
+                  "label": "Fried rice",
+                  "price": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "plat--plat-escalope",
+          "name": "Plat escalope",
+          "price": 4500,
+          "sub": "Frites / riz jaune",
+          "options": [
+            {
+              "id": "accompagnement",
+              "label": "Accompagnement",
+              "type": "single",
+              "required": true,
+              "choices": [
+                {
+                  "id": "frites",
+                  "label": "Frites",
+                  "price": 0
+                },
+                {
+                  "id": "riz-jaune",
+                  "label": "Riz jaune",
+                  "price": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "plat--boulette-de-boeuf",
+          "name": "Boulette de bœuf",
+          "price": 5000,
+          "sub": "Frites / pommes sautées",
+          "options": [
+            {
+              "id": "accompagnement",
+              "label": "Accompagnement",
+              "type": "single",
+              "required": true,
+              "choices": [
+                {
+                  "id": "frites",
+                  "label": "Frites",
+                  "price": 0
+                },
+                {
+                  "id": "pommes-sautees",
+                  "label": "Pommes sautées",
+                  "price": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "plat--mozzarella-sticks",
+          "name": "Mozzarella sticks",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "plat--corn-dog",
+          "name": "Corn dog",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "plat--spaghetti-bolognaise",
+          "name": "Spaghetti bolognaise",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "plat--spaghetti-fettuccine",
+          "name": "Spaghetti fettuccine",
+          "price": 4000,
+          "sub": null
+        }
+      ],
+      "extras": [],
+      "chips": null
+    },
+    {
+      "id": "crepes-gaufres",
+      "group": "Cuisine",
+      "title": "Crêpes & gaufres",
+      "model": "waffle",
+      "note": null,
+      "options": [
+        {
+          "id": "scoop",
+          "label": "Supplément",
+          "type": "multi",
+          "required": false,
+          "choices": [
+            {
+              "id": "scoop-de-glace",
+              "label": "Scoop de glace",
+              "price": 1000
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "id": "crepes-gaufres--crepe-chocolat",
+          "name": "Crêpe chocolat",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "crepes-gaufres--crepe-nutella",
+          "name": "Crêpe Nutella",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "crepes-gaufres--crepe-oreo",
+          "name": "Crêpe Oreo",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "crepes-gaufres--crepe-brownie",
+          "name": "Crêpe brownie",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "crepes-gaufres--crepe-cookies",
+          "name": "Crêpe cookies",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "crepes-gaufres--crepe-3-chocolats",
+          "name": "Crêpe 3 chocolats",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "crepes-gaufres--crepe-fettuccine-chocolat",
+          "name": "Crêpe fettuccine chocolat",
+          "price": 4500,
+          "sub": null
+        },
+        {
+          "id": "crepes-gaufres--crepe-fettuccine-nutella",
+          "name": "Crêpe fettuccine Nutella",
+          "price": 4500,
+          "sub": null
+        },
+        {
+          "id": "crepes-gaufres--crepe-fettuccine-oreo",
+          "name": "Crêpe fettuccine Oreo",
+          "price": 4500,
+          "sub": null
+        },
+        {
+          "id": "crepes-gaufres--crepe-fettuccine-brownie",
+          "name": "Crêpe fettuccine brownie",
+          "price": 4500,
+          "sub": null
+        },
+        {
+          "id": "crepes-gaufres--crepe-fettuccine-cookies",
+          "name": "Crêpe fettuccine cookies",
+          "price": 4500,
+          "sub": null
+        },
+        {
+          "id": "crepes-gaufres--gaufre-chocolat",
+          "name": "Gaufre chocolat",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "crepes-gaufres--gaufre-nutella",
+          "name": "Gaufre Nutella",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "crepes-gaufres--gaufre-brownie",
+          "name": "Gaufre brownie",
+          "price": 4500,
+          "sub": null
+        },
+        {
+          "id": "crepes-gaufres--gaufre-oreo",
+          "name": "Gaufre Oreo",
+          "price": 4000,
+          "sub": null
+        },
+        {
+          "id": "crepes-gaufres--gaufre-cookies",
+          "name": "Gaufre cookies",
+          "price": 4500,
+          "sub": null
+        },
+        {
+          "id": "crepes-gaufres--gaufre-3-chocolats",
+          "name": "Gaufre 3 chocolats",
+          "price": 4500,
+          "sub": null
+        }
+      ],
+      "extras": [
+        {
+          "title": "Supplément",
+          "items": [
+            {
+              "name": "Scoop de glace",
+              "price": 1000
+            }
+          ]
+        }
+      ],
+      "chips": null
+    },
+    {
+      "id": "patisseries",
+      "group": "Cuisine",
+      "title": "Pâtisseries",
+      "model": "croissant",
+      "note": null,
+      "options": [
+        {
+          "id": "sauce",
+          "label": "Supplément",
+          "type": "multi",
+          "required": false,
+          "choices": [
+            {
+              "id": "sauce-chocolat",
+              "label": "Sauce chocolat",
+              "price": 1000
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "id": "patisseries--fondant-chocolat",
+          "name": "Fondant chocolat",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "patisseries--brownie-chocolat",
+          "name": "Brownie chocolat",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "patisseries--cookies",
+          "name": "Cookies",
+          "price": 1500,
+          "sub": null
+        },
+        {
+          "id": "patisseries--eclair",
+          "name": "Éclair",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "patisseries--gateau",
+          "name": "Gâteau",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "patisseries--muffin-au-chocolat",
+          "name": "Muffin au chocolat",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "patisseries--muffin-double-chocolat",
+          "name": "Muffin double chocolat",
+          "price": 2500,
+          "sub": null
+        },
+        {
+          "id": "patisseries--cheesecake-fraise",
+          "name": "Cheesecake fraise",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "patisseries--cheesecake-framboise",
+          "name": "Cheesecake framboise",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "patisseries--cheesecake-fruit-rouge",
+          "name": "Cheesecake fruit rouge",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "patisseries--cheesecake-myrtille",
+          "name": "Cheesecake myrtille",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "patisseries--cheesecake-lotus",
+          "name": "Cheesecake Lotus",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "patisseries--cheesecake-oreo",
+          "name": "Cheesecake Oreo",
+          "price": 3500,
+          "sub": null
+        },
+        {
+          "id": "patisseries--tiramisu",
+          "name": "Tiramisu",
+          "price": 3000,
+          "sub": null
+        },
+        {
+          "id": "patisseries--red-velvet",
+          "name": "Red velvet",
+          "price": 2500,
+          "sub": null
+        }
+      ],
+      "extras": [
+        {
+          "title": "Suppléments",
+          "items": [
+            {
+              "name": "Sauce chocolat",
+              "price": 1000
+            }
+          ]
+        }
+      ],
+      "chips": null
+    }
+  ]
+}
