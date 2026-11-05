@@ -5,6 +5,7 @@
    - crée les onglets, affiche la catégorie choisie, passe en mode ardoise pour la Cuisine
    - demande à scene3d.js d'afficher le bon produit en 3D
    - laisse commande.js ajouter le panier (bouton +, fiche produit) s'il est présent
+   - sans catégorie dans l'adresse (arrivée par le QR code) : écran d'accueil à deux cartes, Café & Boissons / Cuisine
    ===================================================================== */
 
 // ---------- Petits outils ----------
@@ -62,6 +63,14 @@ const tabsEl = $("tabs");
 function buildTabs() {
   tabsEl.innerHTML = "";
   let lastGroup = "";
+
+  // Premier bouton : retour à l'accueil (les deux grandes cartes)
+  const home = document.createElement("button");
+  home.className = "tab tab-home";
+  home.type = "button";
+  home.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 9-7 9 7"/><path d="M5 10v10h14V10"/></svg>Accueil';
+  home.addEventListener("click", goHome);
+  tabsEl.appendChild(home);
 
   CARTE.forEach((cat, i) => {
     // Petit titre « BOISSONS » / « CUISINE » quand le groupe change
@@ -172,12 +181,48 @@ function rerender() {
   if (current >= 0) render(current);
 }
 
+// ---------- Accueil ----------
+
+/** Remplit les deux cartes : première catégorie du groupe, quelques noms, nombre de catégories. */
+function buildHome() {
+  for (const [group, key] of [["Boissons", "drinks"], ["Cuisine", "food"]]) {
+    const cats = CARTE.filter((c) => c.g === group);
+    if (!cats.length) continue;
+    $("home-" + key).href = "#" + cats[0].id;     // un appui ouvre la première catégorie du groupe
+    const names = cats.slice(0, 5).map((c) => c.t).join(" · ");
+    $("home-" + key + "-list").textContent = names + (cats.length > 5 ? "…" : "");
+    $("home-" + key + "-count").textContent = cats.length + " catégories";
+  }
+}
+
+/** Affiche l'accueil (pas de catégorie dans l'adresse). */
+function showHome() {
+  document.body.classList.add("is-home");
+  document.body.classList.remove("board");
+  $("home").hidden = false;
+  CARTE.forEach((c) => c.btn.setAttribute("aria-selected", "false"));
+  current = -1;                       // la prochaine catégorie sera affichée comme une première fois
+  scrollTo(0, 0);
+}
+
+/** Bouton « Accueil » des onglets : nouvelle étape dans l'historique (le bouton Retour ramène à la catégorie). */
+function goHome() {
+  history.pushState(null, "", location.pathname + location.search);
+  showHome();
+}
+
 // ---------- Navigation ----------
 
 function go(i, fromHash) {
   if (i === current || i < 0 || i >= CARTE.length) return;
 
   const first = current < 0;
+  const fromHome = document.body.classList.contains("is-home");
+  if (fromHome) {
+    document.body.classList.remove("is-home");
+    $("home").hidden = true;
+    scrollTo(0, 0);
+  }
   render(i);
 
   // Petite animation d'entrée des lignes (sauf au premier affichage)
@@ -206,11 +251,12 @@ function go(i, fromHash) {
 $("prev").onclick = () => go(current - 1);
 $("next").onclick = () => go(current + 1);
 
-// Lit la catégorie dans l'adresse (#plat) ; sinon la première
+// Lit la catégorie dans l'adresse (#plat) ; sans catégorie : l'accueil
 function fromHash() {
   const id = location.hash.slice(1);
   const i = CARTE.findIndex((c) => c.id === id);
-  go(i >= 0 ? i : 0, true);
+  if (i < 0) { showHome(); return; }
+  go(i, true);
 }
 addEventListener("hashchange", fromHash);
 
@@ -219,6 +265,7 @@ addEventListener("hashchange", fromHash);
 document.addEventListener("DOMContentLoaded", async () => {
   await loadMenu();
   buildTabs();
+  buildHome();
   fromHash();
   document.dispatchEvent(new Event("menu-pret")); // signal pour commande.js
 });

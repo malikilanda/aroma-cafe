@@ -1,0 +1,155 @@
+/* =====================================================================
+   Aroma Café · Écran d'accueil (après le scan du QR code)
+   Deux grandes cartes : « Café & Boissons » (papier crème) et « Cuisine » (ardoise noire),
+   les deux ambiances de la carte. Un appui ouvre la première catégorie du groupe,
+   puis les onglets fonctionnent comme avant.
+   ===================================================================== */
+
+/* Accueil affiché : on cache la navigation par catégories */
+body.is-home nav.tabs,
+body.is-home .stage,
+body.is-home #panel,
+body.is-home .pager,
+body.is-home #foot { display: none; }
+body:not(.is-home) #home { display: none; }
+
+.home { padding: 6px 0 calc(28px + env(safe-area-inset-bottom, 0px)); }
+
+/* Mot d'accueil */
+.home-hello { margin: 4px 0 18px; text-align: center; }
+.home-hello h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 54px;
+  line-height: 1;
+  color: var(--ink);
+}
+.home-hello p {
+  margin: 6px 0 0;
+  font-size: 12px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.home-cards { display: grid; gap: 14px; }
+
+/* ---------- une carte ---------- */
+.home-card {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 210px;
+  padding: 20px 20px 18px;
+  border-radius: 24px;
+  overflow: hidden;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .15s ease, box-shadow .2s ease;
+  animation: home-in .45s ease both;
+}
+.home-card:nth-child(2) { animation-delay: .08s; }
+.home-card:active { transform: scale(.98); }
+.home-card:focus-visible { outline: 3px solid var(--brush); outline-offset: 3px; }
+@keyframes home-in { from { opacity: 0; transform: translateY(14px); } }
+
+.home-kicker {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+.home-title {
+  display: block;
+  margin: 4px 0 0;
+  max-width: 62%;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 46px;
+  line-height: .95;
+}
+.home-list {
+  display: block;
+  margin: 10px 0 0;
+  max-width: 64%;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.home-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .04em;
+}
+.home-go {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  transition: transform .2s ease;
+}
+.home-card:hover .home-go { transform: translateX(3px); }
+.home-go svg { width: 22px; height: 22px; }
+
+/* Illustration (dessin au trait, décoratif) */
+.home-art {
+  position: absolute;
+  right: -6px;
+  top: 18px;
+  width: 44%;
+  max-width: 190px;
+  height: auto;
+  pointer-events: none;
+}
+.home-art * { fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Café & Boissons : papier crème, comme la carte des boissons */
+.home-card.drinks {
+  background: linear-gradient(150deg, #FFFDF9 0%, #F3E6D5 100%);
+  color: #2A1A12;
+  border: 1px solid #E4D6C6;
+  box-shadow: 0 14px 30px -18px rgba(42, 26, 18, .45);
+}
+.home-card.drinks .home-kicker { color: #C42230; }
+.home-card.drinks .home-list { color: #75604F; }
+.home-card.drinks .home-go { background: #2A1A12; color: #FBF6EF; }
+.home-card.drinks .home-art { color: #B98A5E; }
+
+/* Cuisine : ardoise noire, écriture craie et étiquette orange, comme la partie Cuisine */
+.home-card.food {
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(255, 255, 255, .06) 0%, transparent 60%),
+    #1C1B1A;
+  color: #F5EFE6;
+  box-shadow: 0 14px 30px -16px rgba(0, 0, 0, .6);
+}
+.home-card.food .home-kicker { color: #F2A31B; }
+.home-card.food .home-list { color: #C9BFB1; }
+.home-card.food .home-go { background: #F2A31B; color: #1C1B1A; }
+.home-card.food .home-art { color: #8E857A; }
+
+/* Bouton « Accueil » au début des onglets */
+.tab-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+}
+.tab-home svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Grands téléphones et tablettes : les deux cartes côte à côte */
+@media (min-width: 520px) {
+  .home-cards { grid-template-columns: 1fr 1fr; }
+  .home-card { min-height: 300px; }
+  .home-title, .home-list { max-width: none; }
+  .home-art { top: auto; bottom: 14px; right: 80px; width: 76px; opacity: .7; }   /* petit dessin à côté de la flèche */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-card { animation: none; transition: none; }
+}

@@ -14,6 +14,7 @@
 
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/commande.css">
+  <link rel="stylesheet" href="css/accueil.css">
 </head>
 <body>
 
@@ -28,6 +29,51 @@
   </nav>
 
   <main class="wrap">
+    <!-- Accueil (après le scan) : deux grandes cartes, remplies par js/app.js -->
+    <section class="home" id="home" aria-labelledby="home-title" hidden>
+      <div class="home-hello">
+        <h1 id="home-title">Bienvenue</h1>
+        <p>Que souhaitez-vous découvrir ?</p>
+      </div>
+
+      <div class="home-cards">
+        <a class="home-card drinks" id="home-drinks" href="#">
+          <svg class="home-art" viewBox="0 0 120 120" aria-hidden="true">
+            <path d="M28 52h56v22a26 26 0 0 1-26 26h-4a26 26 0 0 1-26-26z"/>
+            <path d="M84 58h6a11 11 0 0 1 0 22h-8"/>
+            <path d="M20 108h80"/>
+            <path d="M44 40c-4-6 4-10 0-16M58 40c-4-6 4-10 0-16M72 40c-4-6 4-10 0-16"/>
+          </svg>
+          <span class="home-kicker">Chaud · glacé · frais</span>
+          <span>
+            <span class="home-title">Café &amp; Boissons</span>
+            <span class="home-list" id="home-drinks-list"></span>
+          </span>
+          <span class="home-foot"><span id="home-drinks-count"></span>
+            <span class="home-go"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </span>
+        </a>
+
+        <a class="home-card food" id="home-food" href="#">
+          <svg class="home-art" viewBox="0 0 120 120" aria-hidden="true">
+            <path d="M16 84h88"/>
+            <path d="M24 84a36 36 0 0 1 72 0"/>
+            <path d="M60 48v-6M54 42h12"/>
+            <path d="M12 96h96"/>
+            <path d="M40 66c4-6 10-10 16-11"/>
+          </svg>
+          <span class="home-kicker">Salé · sucré</span>
+          <span>
+            <span class="home-title">Cuisine</span>
+            <span class="home-list" id="home-food-list"></span>
+          </span>
+          <span class="home-foot"><span id="home-food-count"></span>
+            <span class="home-go"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </span>
+        </a>
+      </div>
+    </section>
+
     <!-- Scène 3D : le produit de la catégorie, dessiné par js/scene3d.js -->
     <div class="stage" id="stage">
       <canvas id="gl" aria-label="Produit en 3D, glissez pour le faire tourner"></canvas>
