@@ -1,0 +1,8 @@
+# Ce que Render n'a pas besoin d'envoyer pour construire l'image
+.git
+.vscode
+.idea
+backend/target
+backend/data
+**/node_modules
+**/*.log
