@@ -83,6 +83,8 @@ svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width:
 }
 .start-btn:active { transform: scale(.97); }
 .start-fine { margin: 16px 0 0; color: #A8937F; font-size: 14px; }
+.start-state { margin: -18px 0 26px; padding: 10px 16px; border-radius: 12px; background: rgba(255, 255, 255, .08); color: var(--cream); font-size: 15px; }
+.start-btn:disabled { opacity: .7; cursor: progress; }
 
 /* ------------------------------------------------------------------ barre du haut */
 .bar {
@@ -163,6 +165,7 @@ svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width:
 .bar-btn[aria-pressed="false"] .ic-on { display: none; }
 .bar-btn[aria-pressed="false"] .ic-off { display: block; }
 .bar-btn circle { fill: currentColor; stroke: none; }
+.bar-btn.armed { background: var(--red); border-color: var(--red); color: #fff; }
 
 .more { position: relative; }
 .more-menu {

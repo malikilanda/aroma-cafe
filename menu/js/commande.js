@@ -5,13 +5,15 @@
    - Le panier est gardé sur le téléphone (localStorage) ; les prix affichés sont indicatifs, le serveur recalcule tout.
    - La table est retenue 3 h au plus, et oubliée dès que la caisse a encaissé la table (fin de la visite).
    - Après l'envoi, le statut de chaque commande est suivi en direct (Reçue → En préparation → Servie).
+   - Service fermé (ou téléphone hors du Wi-Fi en mode wifi-cafe) : le menu reste consultable, avec un message,
+     et le téléphone revérifie chaque minute pour s'ouvrir tout seul quand le service démarre.
    ===================================================================== */
 (function () {
   "use strict";
 
   /* ------------------------------------------------------------------ outils */
   const $ = (id) => document.getElementById(id);
-  const F = (n) => n.toLocaleString("fr-FR").replace(/\s/g, "\u202f") + "\u00a0F";
+  const F = (n) => n.toLocaleString("fr-FR").replace(/\s/g, " ") + " F";
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
@@ -37,7 +39,7 @@
   }
 
   /* ------------------------------------------------------------------ état */
-  let mode = "static"; // static (pas de serveur) | browse (pas de QR) | checking | order | invalid | offline | done (table réglée)
+  let mode = "static"; // static (pas de serveur) | browse (pas de QR) | checking | order | closed (service fermé) | invalid | offline | done (table réglée)
   let table = null, token = null;
   let cart = [];      // {key, itemId, name, cat, qty, unit, options:{groupId:[choiceId]}, labels:[], note}
   let pendingRef = null; // identifiant d'envoi réutilisé si l'envoi échoue puis est relancé
@@ -99,7 +101,7 @@
     if (!(t && k)) { setMode("browse"); return; }
     setMode("checking");
     try {
-      await api(`/api/tables/${t}/check?k=${encodeURIComponent(k)}`);
+      const res = await api(`/api/tables/${t}/check?k=${encodeURIComponent(k)}`);
       table = t; token = k;
       store.set("aroma.table", { t, k, at: Date.now() });   // un nouveau scan remplace toujours l'ancien
       // on retire ?t=…&k=… de l'adresse : recharger la page ne « ressuscite » pas une table oubliée
@@ -109,6 +111,7 @@
       orders = o && o.day === today() ? o.list : [];
       pendingRef = store.get(K().ref, null);
       billAskedAt = store.get(K().bill, 0);
+      if (res && res.commande === false) { setMode("closed", res.message); return; }
       setMode("order");
       refreshOrders();
     } catch (e) {
@@ -117,18 +120,38 @@
     }
   }
 
-  function setMode(m) {
+  let closedTimer = 0;
+  function setMode(m, message) {
     mode = m;
+    clearInterval(closedTimer);
+    // service fermé : on revérifie chaque minute, et le menu redevient commandable dès que le service ouvre
+    if (m === "closed") closedTimer = setInterval(recheck, 60000);
     badge.hidden = m === "static";
-    badge.className = "tbadge" + (m === "order" ? "" : m === "invalid" || m === "offline" ? " warn" : " off");
-    badge.textContent = m === "order" ? "Table " + table : m === "checking" ? "Connexion…" : m === "invalid" ? "QR code invalide" : m === "offline" ? "Hors connexion" : m === "done" ? "Merci !" : "Consultation";
+    badge.className = "tbadge" + (m === "order" ? "" : m === "invalid" || m === "offline" || m === "closed" ? " warn" : " off");
+    badge.textContent = m === "order" ? "Table " + table : m === "checking" ? "Connexion…" : m === "invalid" ? "QR code invalide" : m === "offline" ? "Hors connexion" : m === "done" ? "Merci !" : m === "closed" ? "Commandes fermées" : "Consultation";
     banner.hidden = m === "order" || m === "checking" || m === "static";
     if (m === "browse") banner.innerHTML = "<strong>Envie de commander ?</strong>Scannez le QR code posé sur votre table : vous pourrez commander directement depuis ce menu.";
     if (m === "invalid") banner.innerHTML = "<strong>Ce QR code n'est pas reconnu.</strong>Scannez à nouveau le QR code de votre table, ou demandez à un serveur.";
+    if (m === "closed") banner.innerHTML = `<strong>${esc(message || "Le café ne prend pas de commandes pour le moment.")}</strong>Le menu reste consultable. Votre table sera prête dès l'ouverture du service.`;
     if (m === "done") banner.innerHTML = "<strong>Merci de votre visite, à bientôt !</strong>Votre table est réglée. Pour commander à nouveau, scannez le QR code posé sur votre table.";
     if (m === "offline") banner.innerHTML = "<strong>Impossible de joindre le café.</strong>Connectez-vous au Wi-Fi d'Aroma Café, puis rechargez la page.";
     if (typeof rerender === "function") rerender();
     updateBar();
+  }
+
+  /** Service fermé : le service a-t-il ouvert entre-temps ? */
+  async function recheck() {
+    if (mode !== "closed" || document.hidden) return;
+    try {
+      const res = await api(`/api/tables/${table}/check?k=${encodeURIComponent(token)}`);
+      if (res && res.commande !== false) {
+        setMode("order");
+        refreshOrders();
+        toast("Le service est ouvert : vous pouvez commander !");
+      } else if (res) {
+        setMode("closed", res.message);
+      }
+    } catch (e) { /* réseau momentané : on réessaie dans une minute */ }
   }
 
   /* ------------------------------------------------------------------ point d'entrée pour le menu */
@@ -335,6 +358,7 @@
       btn.disabled = false;
       btn.textContent = "Réessayer l'envoi";
       if (e.status === 403) setMode("invalid");
+      if (e.status === 423) setMode("closed", e.message);   // service fermé entre-temps : le panier est gardé
     } finally {
       sending = false;
     }
@@ -423,7 +447,7 @@
     }
     schedulePoll();
   }
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshOrders(); });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { refreshOrders(); recheck(); } });
 
   /** Fin de la visite : on efface la table, le panier et le suivi de ce téléphone. */
   function endVisit() {

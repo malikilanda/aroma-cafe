@@ -19,8 +19,9 @@
     <div class="start-card">
       <img class="start-logo" src="img/logo.png" alt="Aroma Café" width="720" height="140">
       <p class="start-sub">Caisse · Commandes à table</p>
+      <p class="start-state" id="start-state" hidden></p>
       <button type="button" class="start-btn" id="start-btn">Démarrer le service</button>
-      <p class="start-fine">Active le son des nouvelles commandes.</p>
+      <p class="start-fine">Ouvre les commandes aux clients et active le son.</p>
     </div>
   </div>
 
@@ -39,6 +40,11 @@
     </span>
 
     <time class="clock" id="clock">--:--</time>
+
+    <button type="button" class="bar-btn" id="stop" aria-label="Fermer le service">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.8 0"/></svg>
+      <span class="bar-btn-l">Fermer</span>
+    </button>
 
     <button type="button" class="bar-btn" id="sound" aria-pressed="true" aria-label="Son des nouvelles commandes">
       <svg class="ic-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>

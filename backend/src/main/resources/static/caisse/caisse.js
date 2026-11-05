@@ -5,13 +5,14 @@
      la caisse interroge le serveur toutes les 5 secondes : aucune commande n'est perdue.
    - Nouvelle commande : son + pastille rouge sur la table + message + carte dans « À traiter ».
    - Actions : envoyer en cuisine (imprime le ticket cuisine), servie, annuler, addition, encaisser.
+   - Service : « Démarrer le service » ouvre les commandes aux clients, « Fermer le service » les arrête.
    ===================================================================== */
 (function () {
   "use strict";
 
   /* ------------------------------------------------------------------ outils */
   const $ = (id) => document.getElementById(id);
-  const F = (n) => n.toLocaleString("fr-FR").replace(/\s/g, "\u202f") + "\u00a0F";
+  const F = (n) => n.toLocaleString("fr-FR").replace(/\s/g, " ") + " F";
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const hour = (iso) => new Date(iso).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
   const minutes = (iso) => Math.max(0, Math.floor((Date.now() - new Date(iso)) / 60000));
@@ -39,6 +40,7 @@
   let view = { kind: "list" };   // list | order (id) | table (n)
   let freshIds = new Set();      // commandes arrivées depuis peu (carte qui clignote)
   let ready = false;
+  let serviceOn = store.get("aroma.caisse.service", false);   // le service a été démarré sur cette tablette
 
   /* ------------------------------------------------------------------ appels au serveur */
   async function api(path, method = "GET") {
@@ -377,6 +379,65 @@
     for (const o of today) if (upsert(o) && !silent && o.status === "NOUVELLE") announce(o);
     if (!silent) for (const n of newBills) billAlert(n);
     render();
+    await keepServiceOpen();
+  }
+
+  /* ------------------------------------------------------------------ service (ouverture / fermeture) */
+  /** Si le serveur a redémarré pendant le service, il a oublié qu'il était ouvert : on le lui rappelle. */
+  async function keepServiceOpen() {
+    if (!serviceOn) return;
+    const s = await api("/api/caisse/service");
+    if (!s.ouvert) await api("/api/caisse/service/ouvrir", "POST");
+  }
+
+  function showStart(message) {
+    $("start-state").textContent = message || "";
+    $("start-state").hidden = !message;
+    $("start-btn").textContent = serviceOn ? "Reprendre le service" : "Démarrer le service";
+    $("start-btn").disabled = false;
+    $("start").hidden = false;
+    setTimeout(() => $("start-btn").focus(), 50);
+  }
+
+  async function openService() {
+    const btn = $("start-btn");
+    btn.disabled = true;
+    btn.textContent = "Ouverture…";
+    try {
+      await api("/api/caisse/service/ouvrir", "POST");
+      serviceOn = true;
+      store.set("aroma.caisse.service", true);
+      $("start").hidden = true;
+      toast("Service ouvert : les clients peuvent commander");
+    } catch (e) {
+      btn.disabled = false;
+      btn.textContent = "Réessayer";
+      $("start-state").textContent = "Impossible de joindre le serveur. Vérifiez la connexion Internet, puis réessayez.";
+      $("start-state").hidden = false;
+    }
+  }
+
+  async function closeService(btn) {
+    const unpaid = Salle.numbers().filter((n) => byTable(n).length).length;
+    const text = unpaid ? `Encore ${unpaid} table${unpaid > 1 ? "s" : ""} à encaisser · Fermer quand même` : "Confirmer la fermeture";
+    if (!btn.classList.contains("armed")) {
+      btn.classList.add("armed");
+      btn.querySelector(".bar-btn-l").textContent = "Confirmer";
+      toast(text, unpaid ? "bill" : "");
+      setTimeout(() => { btn.classList.remove("armed"); btn.querySelector(".bar-btn-l").textContent = "Fermer"; }, 4000);
+      return;
+    }
+    btn.classList.remove("armed");
+    btn.querySelector(".bar-btn-l").textContent = "Fermer";
+    try {
+      await api("/api/caisse/service/fermer", "POST");
+      serviceOn = false;
+      store.set("aroma.caisse.service", false);
+      back();
+      showStart(`Service fermé à ${hour(new Date().toISOString())} : les clients ne peuvent plus commander.`);
+    } catch (e) {
+      toast(esc(e.message), "err");
+    }
   }
 
   function billAlert(n) {
@@ -478,19 +539,22 @@
     if (!moreMenu.hidden) closeMore(); else if (view.kind !== "list") back();
   });
 
-  // « Démarrer le service » : débloque le son (exigé par les navigateurs) puis masque l'accueil
+  // « Démarrer le service » : débloque le son (exigé par les navigateurs) et ouvre les commandes aux clients
   $("start-btn").onclick = () => {
     try {
-      audio = new (window.AudioContext || window.webkitAudioContext)();
+      if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)();
       ring("soft");
     } catch (e) { /* pas de son possible : la pastille rouge reste */ }
-    $("start").hidden = true;
+    openService();
   };
+  // « Fermer le service » : deux appuis (le premier affiche « Confirmer »)
+  $("stop").onclick = (e) => closeService(e.currentTarget);
 
   /* ------------------------------------------------------------------ démarrage */
   async function boot() {
     tick();
     setSound(soundOn);
+    if (serviceOn) $("start-btn").textContent = "Reprendre le service";
     let plan = {};
     try { plan = await api("/caisse/salle.json"); } catch (e) { /* plan absent : tables rangées automatiquement */ }
     try { await loadTables(); } catch (e) { /* le compte de tables par défaut sera utilisé */ }
