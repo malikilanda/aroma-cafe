@@ -24,6 +24,7 @@
   const timeOf = (iso) => new Date(iso).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
   const STATUS = { NOUVELLE: "Reçue", EN_CUISINE: "En préparation", SERVIE: "Servie", PAYEE: "Réglée", ANNULEE: "Annulée" };
   const STEP = { NOUVELLE: 1, EN_CUISINE: 2, SERVIE: 3, PAYEE: 3, ANNULEE: 0 };
+  const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
 
   async function api(path, opts = {}) {
     const r = await fetch(path, Object.assign({ headers: { "Content-Type": "application/json" }, cache: "no-store" }, opts));
@@ -130,10 +131,11 @@
     badge.className = "tbadge" + (m === "order" ? "" : m === "invalid" || m === "offline" || m === "closed" ? " warn" : " off");
     badge.textContent = m === "order" ? "Table " + table : m === "checking" ? "Connexion…" : m === "invalid" ? "QR code invalide" : m === "offline" ? "Hors connexion" : m === "done" ? "Merci !" : m === "closed" ? "Commandes fermées" : "Consultation";
     banner.hidden = m === "order" || m === "checking" || m === "static";
+    banner.classList.toggle("done", m === "done");   // fin de visite : bandeau mis en valeur
     if (m === "browse") banner.innerHTML = "<strong>Envie de commander ?</strong>Scannez le QR code posé sur votre table : vous pourrez commander directement depuis ce menu.";
     if (m === "invalid") banner.innerHTML = "<strong>Ce QR code n'est pas reconnu.</strong>Scannez à nouveau le QR code de votre table, ou demandez à un serveur.";
     if (m === "closed") banner.innerHTML = `<strong>${esc(message || "Le café ne prend pas de commandes pour le moment.")}</strong>Le menu reste consultable. Votre table sera prête dès l'ouverture du service.`;
-    if (m === "done") banner.innerHTML = "<strong>Merci de votre visite, à bientôt !</strong>Votre table est réglée. Pour commander à nouveau, scannez le QR code posé sur votre table.";
+    if (m === "done") banner.innerHTML = `<span class="ib-ico" aria-hidden="true">${CHECK}</span><span><strong>Merci de votre visite, à bientôt !</strong>Votre table est réglée. Pour commander à nouveau, scannez le QR code posé sur votre table.</span>`;
     if (m === "offline") banner.innerHTML = "<strong>Impossible de joindre le café.</strong>Connectez-vous au Wi-Fi d'Aroma Café, puis rechargez la page.";
     if (typeof rerender === "function") rerender();
     updateBar();
@@ -452,13 +454,29 @@
   /** Fin de la visite : on efface la table, le panier et le suivi de ce téléphone. */
   function endVisit() {
     clearTimeout(pollTimer);
+    // ce qu'on affiche dans le remerciement, avant d'effacer la visite
+    const paid = orders.filter((o) => o.status === "PAYEE").reduce((a, o) => a + o.total, 0);
+    const tableNo = table;
     if (sheetOpen) closeSheet();
     try { for (const key of Object.values(K())) localStorage.removeItem(key); } catch (e) { /* pas grave */ }
     store.set("aroma.table", null);
     cart = []; orders = []; pendingRef = null; billAskedAt = 0;
     table = null; token = null;
     setMode("done");
-    toast("Merci de votre visite, à bientôt !");
+    scrollTo({ top: 0, behavior: "smooth" });            // le bandeau « Merci » en haut de l'écran
+    if (navigator.vibrate) navigator.vibrate(60);
+    // grande fiche de remerciement, impossible à manquer
+    setTimeout(() => {
+      openSheet(`<div class="thanks">
+          <span class="thanks-ico" aria-hidden="true">${CHECK}</span>
+          <h2 class="thanks-title" id="sheet-title">Merci !</h2>
+          <p class="thanks-lead">Votre table ${tableNo} est réglée${paid ? ` · <b>${F(paid)}</b>` : ""}.</p>
+          <p class="thanks-sub">Toute l'équipe d'Aroma Café vous remercie de votre visite. À très bientôt !</p>
+          <p class="thanks-fine">Pour commander à nouveau, scannez le QR code posé sur votre table.</p>
+        </div>`,
+        `<button type="button" class="cta" id="thanks-ok">Revoir le menu</button>`);
+      $("thanks-ok").onclick = closeSheet;
+    }, 350);
   }
 
   /* ------------------------------------------------------------------ démarrage */

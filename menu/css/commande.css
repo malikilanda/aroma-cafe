@@ -148,5 +148,25 @@ textarea.note:focus{outline:none;border-color:var(--ink)}
   box-shadow:0 14px 30px -12px rgba(0,0,0,.5);transition:transform .3s,opacity .3s;pointer-events:none}
 .toast.on{transform:translate(-50%,0);opacity:1}
 
+/* Fin de visite : bandeau mis en valeur (couleurs de la carte, crème ou ardoise) */
+.info-banner.done{display:flex;gap:12px;align-items:flex-start;padding:16px;border:1.5px solid var(--brush);
+  background:color-mix(in srgb,var(--brush) 14%,var(--paper));font-size:14.5px;animation:done-in .6s ease both}
+.info-banner.done strong{font-size:16.5px;margin-bottom:4px}
+.ib-ico{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--brush);color:#2A1A12}
+.ib-ico svg{width:19px;height:19px}
+@keyframes done-in{0%{transform:scale(.96);box-shadow:0 0 0 0 color-mix(in srgb,var(--brush) 60%,transparent)}
+  60%{transform:scale(1.01);box-shadow:0 0 0 10px color-mix(in srgb,var(--brush) 0%,transparent)}100%{transform:none}}
+/* Fiche de remerciement */
+.thanks{text-align:center;padding:14px 4px 6px}
+.thanks-ico{display:grid;place-items:center;width:72px;height:72px;margin:6px auto 6px;border-radius:50%;background:var(--brush);color:#2A1A12;
+  box-shadow:0 0 0 10px color-mix(in srgb,var(--brush) 22%,transparent);animation:thanks-pop .5s cubic-bezier(.3,1.6,.5,1) both .1s}
+.thanks-ico svg{width:36px;height:36px}
+.thanks-title{margin:10px 0 2px;font-family:var(--display);font-weight:400;font-size:62px;line-height:1;color:var(--ink)}
+.thanks-lead{margin:8px 0 0;font-size:17px;color:var(--ink)}
+.thanks-lead b{white-space:nowrap}
+.thanks-sub{margin:8px auto 0;max-width:30ch;font-size:15px;line-height:1.5;color:var(--ink-soft)}
+.thanks-fine{margin:16px auto 0;max-width:32ch;padding-top:14px;border-top:1px solid var(--line);font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+@keyframes thanks-pop{from{transform:scale(.4);opacity:0}}
+
 body.locked{overflow:hidden}
-@media (prefers-reduced-motion:reduce){.sheet,.scrim,.cbar,.toast{transition:none}.bump{animation:none}}
+@media (prefers-reduced-motion:reduce){.sheet,.scrim,.cbar,.toast{transition:none}.bump,.info-banner.done,.thanks-ico{animation:none}}
