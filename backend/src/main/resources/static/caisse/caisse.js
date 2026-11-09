@@ -6,6 +6,8 @@
    - Nouvelle commande : son + pastille rouge sur la table + message + carte dans « À traiter ».
    - Actions : envoyer en cuisine (imprime le ticket cuisine), servie, annuler, addition, encaisser.
    - Service : « Démarrer le service » ouvre les commandes aux clients, « Fermer le service » les arrête.
+   - Carte du jour : un article marqué « Épuisé » est grisé sur le menu des clients (jusqu'au lendemain).
+   - Retirer : un article d'une commande pas encore servie peut être retiré ; le client est prévenu sur son téléphone.
    ===================================================================== */
 (function () {
   "use strict";
@@ -23,6 +25,9 @@
   };
   const STATUS = { NOUVELLE: "Nouvelle", EN_CUISINE: "En cuisine", SERVIE: "Servie", PAYEE: "Réglée", ANNULEE: "Annulée" };
   const UNPAID = ["NOUVELLE", "EN_CUISINE", "SERVIE"];
+  /** Texte sans accents ni majuscules : « Café Glacé » → « cafe glace ». */
+  const norm = (t) => String(t).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const REASON = { EPUISE: "Épuisé", ERREUR: "Erreur", CLIENT: "Demande du client" };
   const ICON = {
     kitchen: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 13.9A4 4 0 0 1 7.5 6a5 5 0 0 1 9 0A4 4 0 0 1 18 13.9V21H6z"/><path d="M6 17h12"/></svg>',
     check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>',
@@ -36,20 +41,26 @@
   const orders = new Map();      // id → commande du jour
   const bills = new Map();       // table → heure de la demande d'addition
   let tableCount = 10;
-  let tab = "todo";              // todo | today
+  let tab = "todo";              // todo | today | carte
   let view = { kind: "list" };   // list | order (id) | table (n)
   let freshIds = new Set();      // commandes arrivées depuis peu (carte qui clignote)
   let ready = false;
   let serviceOn = store.get("aroma.caisse.service", false);   // le service a été démarré sur cette tablette
+  let carte = [];                // catégories du menu : [{id, title, items:[{id, name, price}]}]
+  let soldOut = new Set();       // articles épuisés aujourd'hui
+  let search = "";               // recherche dans la carte du jour
+  let removing = null;           // article en cours de retrait : {id (commande), index (ligne), reason, mark}
 
   /* ------------------------------------------------------------------ appels au serveur */
-  async function api(path, method = "GET") {
-    const r = await fetch(path, { method, cache: "no-store", headers: { Accept: "application/json" } });
+  async function api(path, method = "GET", body) {
+    const headers = { Accept: "application/json" };
+    if (body !== undefined) headers["Content-Type"] = "application/json";
+    const r = await fetch(path, { method, cache: "no-store", headers, body: body === undefined ? undefined : JSON.stringify(body) });
     if (r.status === 401) { location.href = "/login.html"; throw new Error("Session expirée"); }
     if (r.status === 204) return null;
-    const body = await r.json().catch(() => null);
-    if (!r.ok) throw new Error((body && body.message) || "Le serveur ne répond pas.");
-    return body;
+    const data = await r.json().catch(() => null);
+    if (!r.ok) throw new Error((data && data.message) || "Le serveur ne répond pas.");
+    return data;
   }
 
   /* ------------------------------------------------------------------ son */
@@ -130,6 +141,8 @@
     $("tab-todo-n").textContent = nTodo + [...bills.keys()].filter((n) => byTable(n).length).length + toCollect().length;
     $("tab-todo-n").classList.toggle("hot", nNew > 0);
     $("tab-today-n").textContent = orders.size;
+    $("tab-carte-n").textContent = soldOut.size;
+    $("tab-carte-n").hidden = soldOut.size === 0;
     document.title = (nNew ? `(${nNew}) ` : "") + "Aroma Café · Caisse";
 
     // un bouton « Confirmer … » est armé : on ne redessine pas le détail sous le doigt de la caissière
@@ -178,7 +191,10 @@
     $("side-detail").hidden = true;
     $("tab-todo").setAttribute("aria-selected", String(tab === "todo"));
     $("tab-today").setAttribute("aria-selected", String(tab === "today"));
+    $("tab-carte").setAttribute("aria-selected", String(tab === "carte"));
     const list = $("list");
+    $("av-search-wrap").hidden = tab !== "carte";
+    if (tab === "carte") { renderCarte(list); return; }
     if (tab === "todo") {
       const billTables = [...bills.keys()].filter((n) => byTable(n).length).sort((a, b) => bills.get(a).localeCompare(bills.get(b)));
       const items = todo();
@@ -193,11 +209,85 @@
     }
   }
 
-  function linesHTML(o, withPrice = true) {
-    return `<ul class="lines">${o.lines.map((l) => `<li>
-        <span class="l-q">${l.quantity}×</span><span class="l-n">${esc(l.name)}</span><span class="l-p">${withPrice ? F(l.lineTotal) : ""}</span>
+  /** Lignes d'une commande. editable : bouton « Retirer » sur chaque article (commande pas encore servie). */
+  function linesHTML(o, withPrice = true, editable = false) {
+    const rows = o.lines.map((l, i) => {
+      const open = editable && removing && removing.id === o.id && removing.index === i;
+      return `<li class="${open ? "is-removing" : ""}">
+        <span class="l-q">${l.quantity}×</span><span class="l-n">${esc(l.name)}</span>
+        <span class="l-p">${withPrice ? F(l.lineTotal) : ""}${editable && !open ? `<button type="button" class="l-rm" data-rm="${i}" aria-label="Retirer ${esc(l.name)}">Retirer</button>` : ""}</span>
         ${l.options.length ? `<span class="l-o">${l.options.map(esc).join(" · ")}</span>` : ""}
-        ${l.note ? `<span class="l-note">« ${esc(l.note)} »</span>` : ""}</li>`).join("")}</ul>`;
+        ${l.note ? `<span class="l-note">« ${esc(l.note)} »</span>` : ""}
+        ${open ? removePanelHTML(o, l) : ""}</li>`;
+    }).join("");
+    const gone = (o.removed || []).map((r) => `<li class="l-removed">
+        <span class="l-q">${r.quantity}×</span><span class="l-n">${esc(r.name)}</span><span class="l-p">Retiré</span>
+        <span class="l-o">${REASON[r.reason] || "Retiré"}</span></li>`).join("");
+    return `<ul class="lines">${rows}${gone}</ul>`;
+  }
+
+  /** Petit panneau sous l'article : raison du retrait + « marquer épuisé ». La classe armed bloque le rafraîchissement automatique. */
+  function removePanelHTML(o, l) {
+    const last = o.lines.length === 1;
+    return `<div class="rm-panel armed">
+        <p class="rm-q">Pourquoi retirer « ${esc(l.name)} » ?</p>
+        <div class="rm-reasons">${Object.entries(REASON).map(([k, v]) =>
+          `<button type="button" class="rm-chip" data-reason="${k}" aria-pressed="${removing.reason === k}">${v}</button>`).join("")}</div>
+        ${removing.reason === "EPUISE" ? `<label class="rm-mark"><input type="checkbox" id="rm-mark"${removing.mark ? " checked" : ""}>
+          <span>Marquer aussi « ${esc(l.name)} » épuisé pour aujourd'hui (grisé sur le menu des clients)</span></label>` : ""}
+        ${last ? `<p class="rm-warn">C'est le seul article : la commande sera annulée.</p>` : ""}
+        <div class="rm-row"><button type="button" class="btn" data-rm-cancel>Garder</button>
+          <button type="button" class="btn danger-fill" data-rm-ok>${last ? "Retirer et annuler" : "Retirer l'article"}</button></div>
+      </div>`;
+  }
+
+  /* ------------------------------------------------------------------ carte du jour (articles épuisés) */
+  function renderCarte(list) {
+    if (!carte.length) {
+      list.innerHTML = `<p class="empty"><b>Carte indisponible</b>Impossible de charger le menu. Vérifiez la connexion.</p>`;
+      return;
+    }
+    const row = (it) => {
+      const out = soldOut.has(it.id);
+      return `<button type="button" class="av${out ? " out" : ""}" data-av="${esc(it.id)}" aria-pressed="${out}">
+          <span class="av-n">${esc(it.name)}</span><span class="av-p">${it.price ? F(it.price) : ""}</span>
+          <span class="av-s">${out ? "Épuisé" : "Disponible"}</span></button>`;
+    };
+    // recherche : sans tenir compte des accents ni des majuscules, sur le nom de l'article ou de sa catégorie
+    const words = norm(search).split(/\s+/).filter(Boolean);
+    if (words.length) {
+      const found = carte.flatMap((c) => c.items.filter((it) => {
+        const text = norm(it.name + " " + c.title);
+        return words.every((w) => text.includes(w));
+      }));
+      list.innerHTML = found.length
+        ? `<h3 class="list-h">${found.length} résultat${found.length > 1 ? "s" : ""}</h3>` + found.map(row).join("")
+        : `<p class="empty"><b>Aucun article trouvé</b>Vérifiez l'orthographe ou essayez un autre mot.</p>`;
+      return;
+    }
+    const outItems = carte.flatMap((c) => c.items).filter((it) => soldOut.has(it.id));
+    list.innerHTML = `<p class="av-help">Touchez un article pour le marquer <b>épuisé</b> : il est grisé sur le menu des clients jusqu'à demain matin.</p>`
+      + (outItems.length ? `<h3 class="list-h">Épuisés aujourd'hui</h3>` + outItems.map(row).join("") : "")
+      + carte.map((c) => `<h3 class="list-h">${esc(c.title)}</h3>` + c.items.map(row).join("")).join("");
+  }
+
+  async function toggleSoldOut(btn) {
+    const id = btn.dataset.av, out = !soldOut.has(id);
+    const it = carte.flatMap((c) => c.items).find((x) => x.id === id);
+    await run(btn, async () => {
+      const r = await api(`/api/caisse/epuises/${encodeURIComponent(id)}?epuise=${out}`, "POST");
+      soldOut = new Set(r.epuises);
+      toast(out ? `« ${esc(it ? it.name : id)} » marqué épuisé` : `« ${esc(it ? it.name : id)} » de nouveau disponible`);
+      render();
+    });
+  }
+
+  async function loadCarte() {
+    const menu = await api("/api/menu");
+    carte = (menu.categories || []).map((c) => ({
+      id: c.id, title: c.title,
+      items: (c.items || []).map((it) => ({ id: it.id, name: it.name, price: it.price })),
+    }));
   }
 
   function showDetail(html) {
@@ -227,12 +317,14 @@
       <button type="button" class="btn" data-act="receipt">${ICON.print}Ticket caisse</button>`;
     else actions = `<button type="button" class="btn" data-act="receipt">${ICON.print}Ticket caisse</button>`;
 
+    const editable = o.status === "NOUVELLE" || o.status === "EN_CUISINE";
+    if (!editable || (removing && (removing.id !== o.id || removing.index >= o.lines.length))) removing = null;
     showDetail(`<div class="d-head">
         <div class="d-table${o.status === "NOUVELLE" ? " new" : ""}"><small>Table</small><b>${o.table}</b></div>
         <div><h2 class="d-title">Commande n° ${o.number} <span class="pill st-${o.status}">${STATUS[o.status]}</span></h2>
           <p class="d-meta ${isLate(o) ? "late" : ""}">${when}</p></div>
       </div>
-      ${linesHTML(o)}
+      ${linesHTML(o, true, editable)}
       <div class="total"><span>Total</span><strong>${F(o.total)}</strong></div>
       <div class="actions" data-order="${o.id}">${actions}</div>`);
   }
@@ -267,6 +359,7 @@
   function openOrder(id) {
     const o = orders.get(id);
     if (!o) return;
+    removing = null;
     view = { kind: "order", id };
     Salle.select(o.table);
     render();
@@ -278,6 +371,7 @@
     render();
   }
   function back() {
+    removing = null;
     view = { kind: "list" };
     Salle.select(null);
     render();
@@ -346,6 +440,51 @@
     }
   }
 
+  /** Retrait d'un article : ouvrir le panneau, choisir la raison, confirmer. */
+  async function onRemoveClick(e) {
+    if (view.kind !== "order") return false;
+    const o = orders.get(view.id);
+    if (!o) return false;
+    const rm = e.target.closest("[data-rm]");
+    if (rm) {
+      removing = { id: o.id, index: +rm.dataset.rm, reason: "EPUISE", mark: true };
+      renderOrder(o);
+      return true;
+    }
+    if (!removing) return false;
+    const chip = e.target.closest("[data-reason]");
+    if (chip) {
+      const box = $("rm-mark");
+      if (box) removing.mark = box.checked;
+      removing.reason = chip.dataset.reason;
+      renderOrder(o);
+      return true;
+    }
+    if (e.target.closest("[data-rm-cancel]")) { removing = null; renderOrder(o); return true; }
+    const ok = e.target.closest("[data-rm-ok]");
+    if (ok) {
+      const line = o.lines[removing.index];
+      const box = $("rm-mark");
+      const mark = removing.reason === "EPUISE" && (box ? box.checked : removing.mark);
+      await run(ok, async () => {
+        const v = await api(`/api/caisse/orders/${o.id}/lignes/${removing.index}/retirer`, "POST",
+          { itemId: line.itemId, reason: removing.reason, markSoldOut: mark });
+        upsert(v);
+        removing = null;
+        if (mark) soldOut.add(line.itemId);
+        if (v.status === "ANNULEE") {
+          toast(`« ${esc(line.name)} » retiré : commande n° ${v.number} annulée`);
+          back();
+          return;
+        }
+        toast(`« ${esc(line.name)} » retiré · nouveau total ${F(v.total)}${v.status === "EN_CUISINE" ? " · prévenez la cuisine" : ""}`);
+        render();                        // détail, montant de la table sur le plan et compteurs
+      });
+      return true;
+    }
+    return false;
+  }
+
   /* ------------------------------------------------------------------ données */
   /** Ajoute ou met à jour une commande ; renvoie true si elle est nouvelle pour la caisse. */
   function upsert(o) {
@@ -373,7 +512,8 @@
 
   /** Rechargement complet (au démarrage, après une coupure, puis régulièrement par sécurité). */
   async function sync(silent) {
-    const [today, newBills] = await Promise.all([api("/api/caisse/orders?scope=today"), loadTables()]);
+    const [today, newBills, epuises] = await Promise.all([api("/api/caisse/orders?scope=today"), loadTables(), api("/api/caisse/epuises")]);
+    soldOut = new Set(epuises.epuises);
     const ids = new Set(today.map((o) => o.id));
     for (const id of [...orders.keys()]) if (!ids.has(id)) orders.delete(id);   // changement de jour
     for (const o of today) if (upsert(o) && !silent && o.status === "NOUVELLE") announce(o);
@@ -452,6 +592,7 @@
       const isNew = upsert(ev.order);
       if (ev.type === "ORDER_CREATED" && isNew) announce(ev.order);
     }
+    if (ev.type === "MENU_UPDATED") soldOut = new Set(ev.epuises || []);
     if (ev.type === "BILL_REQUESTED") { bills.set(ev.table, new Date().toISOString()); billAlert(ev.table); }
     if (ev.type === "TABLE_CLOSED") {
       bills.delete(ev.table);
@@ -513,12 +654,15 @@
 
   /* ------------------------------------------------------------------ événements de l'écran */
   $("list").addEventListener("click", (e) => {
+    const av = e.target.closest("[data-av]");
+    if (av) return toggleSoldOut(av);
     const c = e.target.closest(".card");
     if (!c) return;
     if (c.dataset.order) openOrder(+c.dataset.order);
     else if (c.dataset.table) openTable(+c.dataset.table);
   });
-  $("detail").addEventListener("click", (e) => {
+  $("detail").addEventListener("click", async (e) => {
+    if (await onRemoveClick(e)) return;
     const b = e.target.closest("[data-act]");
     if (b) return act(b);
     const o = e.target.closest("[data-open]");
@@ -527,6 +671,21 @@
   $("back").onclick = back;
   $("tab-todo").onclick = () => { tab = "todo"; render(); };
   $("tab-today").onclick = () => { tab = "today"; render(); };
+  $("tab-carte").onclick = () => { tab = "carte"; render(); $("list").scrollTop = 0; };
+  $("av-search").addEventListener("input", (e) => {
+    search = e.target.value;
+    $("av-clear").hidden = !search;
+    renderList();
+    $("list").scrollTop = 0;
+  });
+  $("av-search").addEventListener("keydown", (e) => { if (e.key === "Escape") { e.stopPropagation(); $("av-clear").click(); } });
+  $("av-clear").onclick = () => {
+    search = "";
+    $("av-search").value = "";
+    $("av-clear").hidden = true;
+    renderList();
+    $("av-search").focus();
+  };
   $("sound").onclick = () => { setSound(!soundOn); if (soundOn) ring("soft"); };
   $("test-sound").onclick = () => { closeMore(); ring("new"); };
 
@@ -558,6 +717,7 @@
     let plan = {};
     try { plan = await api("/caisse/salle.json"); } catch (e) { /* plan absent : tables rangées automatiquement */ }
     try { await loadTables(); } catch (e) { /* le compte de tables par défaut sera utilisé */ }
+    try { await loadCarte(); } catch (e) { /* l'onglet « Carte du jour » affichera un message */ }
 
     Salle.init({ floor: $("floor"), canvas: $("salle"), tags: $("tags"), plan, count: tableCount, onSelect: openTable });
     ready = true;

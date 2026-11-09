@@ -6,64 +6,52 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Une commande passée depuis une table.
- *
- * Deux identifiants :
- * - id       : numéro interne (base de données, caisse)
- * - publicId : identifiant long et impossible à deviner, donné au téléphone du client
- *              pour suivre SA commande sans pouvoir lire celles des autres tables
- *
- * Et un numéro lisible, « number », remis à 1 chaque matin : c'est le « Commande n° 12 »
- * imprimé sur les tickets.
- *
- * (On l'appelle CustomerOrder et pas Order : ORDER est un mot réservé du SQL.)
- */
 @Entity
 @Table(name = "commande", indexes = {
         @Index(name = "idx_commande_statut", columnList = "status"),
         @Index(name = "idx_commande_table", columnList = "tableNumber")})
 public class CustomerOrder {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /** identifiant non devinable donné au téléphone pour suivre sa commande */
     @Column(unique = true, nullable = false, length = 36)
     private String publicId;
 
-    /**
-     * Identifiant créé par le téléphone pour CET envoi. Si le réseau est lent et que le client
-     * appuie deux fois sur « Envoyer », le serveur reconnaît le même clientRef et ne crée
-     * pas une deuxième commande.
-     */
+    /** généré par le téléphone : un double envoi (réseau lent, double appui) ne crée pas deux commandes */
     @Column(unique = true, nullable = false, length = 64)
     private String clientRef;
 
-    private int number;          // numéro du jour : 1, 2, 3…
-    private int tableNumber;     // 1 à 10
+    /** numéro du jour : 1, 2, 3… remis à zéro chaque matin */
+    private int number;
+    private int tableNumber;
 
-    @Enumerated(EnumType.STRING) // enregistre "EN_CUISINE" en clair, pas un chiffre
+    @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private OrderStatus status = OrderStatus.NOUVELLE;
 
-    private int total;           // somme des lignes, en F CFA
-
-    private Instant createdAt;     // reçue
-    private Instant transmittedAt; // envoyée en cuisine
-    private Instant servedAt;      // servie
-    private Instant closedAt;      // payée ou annulée
+    private int total;
+    private Instant createdAt;
+    private Instant transmittedAt;
+    private Instant servedAt;
+    private Instant closedAt;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "commande_ligne", joinColumns = @JoinColumn(name = "commande_id"))
-    @OrderColumn(name = "position") // garde l'ordre des lignes tel que le client les a ajoutées
+    @OrderColumn(name = "position")
     private List<OrderLine> lines = new ArrayList<>();
 
-    protected CustomerOrder() {
-    }
+    /**
+     * Articles retirés par la caisse (épuisé, erreur…), un par ligne au format « quantité|nom|raison ».
+     * Le téléphone du client s'en sert pour prévenir le client.
+     */
+    @Column(length = 2000)
+    private String removedText;
 
-    public CustomerOrder(String publicId, String clientRef, int number, int tableNumber,
-                         List<OrderLine> lines, Instant now) {
+    protected CustomerOrder() {}
+
+    public CustomerOrder(String publicId, String clientRef, int number, int tableNumber, List<OrderLine> lines, Instant now) {
         this.publicId = publicId;
         this.clientRef = clientRef;
         this.number = number;
@@ -73,34 +61,26 @@ public class CustomerOrder {
         this.createdAt = now;
     }
 
-    // ---------- Changements d'étape (les vérifications sont faites dans le service) ----------
-
-    /** La caisse a imprimé le ticket cuisine. */
-    public void transmit(Instant now) {
-        status = OrderStatus.EN_CUISINE;
-        transmittedAt = now;
-    }
-
-    /** La serveuse a apporté la commande. */
+    public void transmit(Instant now) { status = OrderStatus.EN_CUISINE; transmittedAt = now; }
     public void serve(Instant now) {
         if (transmittedAt == null) transmittedAt = now;
-        status = OrderStatus.SERVIE;
-        servedAt = now;
+        status = OrderStatus.SERVIE; servedAt = now;
     }
+    public void cancel(Instant now) { status = OrderStatus.ANNULEE; closedAt = now; }
+    public void pay(Instant now) { status = OrderStatus.PAYEE; closedAt = now; }
 
-    /** Réglée avec l'addition. */
-    public void pay(Instant now) {
-        status = OrderStatus.PAYEE;
-        closedAt = now;
+    /**
+     * Retire la ligne n° index (0 = première), recalcule le total et garde une trace pour le client.
+     * S'il ne reste plus aucune ligne, la commande est annulée.
+     */
+    public OrderLine removeLine(int index, String reason, Instant now) {
+        OrderLine removed = lines.remove(index);
+        total = lines.stream().mapToInt(OrderLine::getLineTotal).sum();
+        String entry = removed.getQuantity() + "|" + removed.getName().replace("|", " ") + "|" + reason;
+        removedText = removedText == null || removedText.isBlank() ? entry : removedText + "\n" + entry;
+        if (lines.isEmpty()) cancel(now);
+        return removed;
     }
-
-    /** Annulée par la caisse. */
-    public void cancel(Instant now) {
-        status = OrderStatus.ANNULEE;
-        closedAt = now;
-    }
-
-    // ---------- Lecture ----------
 
     public Long getId() { return id; }
     public String getPublicId() { return publicId; }
@@ -114,4 +94,7 @@ public class CustomerOrder {
     public Instant getServedAt() { return servedAt; }
     public Instant getClosedAt() { return closedAt; }
     public List<OrderLine> getLines() { return lines; }
+    public List<String> getRemovedEntries() {
+        return removedText == null || removedText.isBlank() ? List.of() : List.of(removedText.split("\n"));
+    }
 }

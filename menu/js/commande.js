@@ -7,6 +7,8 @@
    - Après l'envoi, le statut de chaque commande est suivi en direct (Reçue → En préparation → Servie).
    - Service fermé (ou téléphone hors du Wi-Fi en mode wifi-cafe) : le menu reste consultable, avec un message,
      et le téléphone revérifie chaque minute pour s'ouvrir tout seul quand le service démarre.
+   - Articles épuisés (marqués par la caisse) : grisés dans le menu, impossibles à ajouter ou à envoyer.
+   - Article retiré par la caisse après l'envoi : le client est prévenu par une fiche, avec le nouveau total.
    ===================================================================== */
 (function () {
   "use strict";
@@ -24,6 +26,7 @@
   const timeOf = (iso) => new Date(iso).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
   const STATUS = { NOUVELLE: "Reçue", EN_CUISINE: "En préparation", SERVIE: "Servie", PAYEE: "Réglée", ANNULEE: "Annulée" };
   const STEP = { NOUVELLE: 1, EN_CUISINE: 2, SERVIE: 3, PAYEE: 3, ANNULEE: 0 };
+  const REMOVED = { EPUISE: "épuisé, retiré", ERREUR: "retiré par le café", CLIENT: "retiré à votre demande" };
   const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
 
   async function api(path, opts = {}) {
@@ -46,6 +49,7 @@
   let pendingRef = null; // identifiant d'envoi réutilisé si l'envoi échoue puis est relancé
   let orders = [];    // commandes du jour à cette table
   let billAskedAt = 0;
+  let soldOut = new Set(); // articles épuisés aujourd'hui (marqués par la caisse)
   const TABLE_TTL = 3 * 3600e3; // durée max pendant laquelle le téléphone retient sa table après le scan
   const K = () => ({ cart: "aroma.cart." + table, orders: "aroma.orders." + table, bill: "aroma.bill." + table, ref: "aroma.ref." + table });
 
@@ -114,6 +118,7 @@
       billAskedAt = store.get(K().bill, 0);
       if (res && res.commande === false) { setMode("closed", res.message); return; }
       setMode("order");
+      loadSoldOut();
       refreshOrders();
     } catch (e) {
       if (e.status === 403) { store.set("aroma.table", null); setMode("invalid"); }
@@ -148,6 +153,7 @@
       const res = await api(`/api/tables/${table}/check?k=${encodeURIComponent(token)}`);
       if (res && res.commande !== false) {
         setMode("order");
+        loadSoldOut();
         refreshOrders();
         toast("Le service est ouvert : vous pouvez commander !");
       } else if (res) {
@@ -156,10 +162,27 @@
     } catch (e) { /* réseau momentané : on réessaie dans une minute */ }
   }
 
+  /* ------------------------------------------------------------------ articles épuisés */
+  /** Liste des articles épuisés aujourd'hui. Renvoie true si elle a changé. */
+  async function loadSoldOut() {
+    if (!window.SERVEUR) return false;
+    try {
+      const r = await api("/api/menu/epuises");
+      const next = new Set((r && r.epuises) || []);
+      const changed = next.size !== soldOut.size || [...next].some((id) => !soldOut.has(id));
+      soldOut = next;
+      if (changed) { rerender(); updateBar(); }
+      return changed;
+    } catch (e) { return false; /* réseau momentané : on garde la liste connue */ }
+  }
+  // pendant la visite, la liste est revérifiée chaque minute
+  setInterval(() => { if (mode === "order" && !document.hidden) loadSoldOut(); }, 60000);
+
   /* ------------------------------------------------------------------ point d'entrée pour le menu */
   window.Commande = {
     enabled: () => mode === "order",
     rowExtra(id) {
+      if (soldOut.has(id)) return `<span class="add out" aria-hidden="true">Épuisé</span>`;
       const n = cart.filter((l) => l.itemId === id).reduce((a, l) => a + l.qty, 0);
       return `<span class="add${n ? " in" : ""}" aria-hidden="true">${n || "+"}</span>`;
     },
@@ -233,6 +256,7 @@
   function openProduct(id) {
     const it = findItem(id);
     if (!it || mode !== "order") return;
+    if (soldOut.has(id)) { toast(`« ${it.n} » est épuisé aujourd'hui`); return; }
     const groups = it.options || [];
     let qty = 1;
 
@@ -303,13 +327,15 @@
 
   /* ------------------------------------------------------------------ panier */
   function openCart() {
-    const lines = cart.map((l, i) => `<li class="cl">
+    const lines = cart.map((l, i) => `<li class="cl${soldOut.has(l.itemId) ? " is-out" : ""}">
         <div class="cl-main"><span class="cl-name">${esc(l.name)}</span>
-          ${l.labels.length || l.note ? `<span class="cl-opts">${l.labels.map(esc).join(" · ")}${l.note ? `${l.labels.length ? " · " : ""}« ${esc(l.note)} »` : ""}</span>` : ""}</div>
+          ${l.labels.length || l.note ? `<span class="cl-opts">${l.labels.map(esc).join(" · ")}${l.note ? `${l.labels.length ? " · " : ""}« ${esc(l.note)} »` : ""}</span>` : ""}
+          ${soldOut.has(l.itemId) ? `<span class="cl-out">Épuisé aujourd'hui : retirez-le avec « − »</span>` : ""}</div>
         <div class="cl-side"><span class="cl-price">${F(l.unit * l.qty)}</span>
           <div class="qty sm"><button type="button" data-dec="${i}" aria-label="Un ${esc(l.name)} de moins">−</button><output>${l.qty}</output><button type="button" data-inc="${i}" aria-label="Un ${esc(l.name)} de plus"${l.qty >= 20 ? " disabled" : ""}>+</button></div>
         </div></li>`).join("");
     const total = cart.reduce((a, l) => a + l.qty * l.unit, 0);
+    const outCount = cart.filter((l) => soldOut.has(l.itemId)).length;
     const body = cart.length
       ? `<h2 class="sh-title" id="sheet-title">Votre panier</h2><p class="sh-sub">Table ${table}</p>
          <ul class="cart">${lines}</ul>
@@ -318,7 +344,9 @@
          <p class="err" id="cart-err" hidden></p>`
       : `<h2 class="sh-title" id="sheet-title">Votre panier</h2>
          <p class="empty"><b>Votre panier est vide.</b>Touchez un produit du menu pour l'ajouter.</p>`;
-    const foot = cart.length ? `<button type="button" class="cta" id="send">Envoyer la commande · ${F(total)}</button>` : `<button type="button" class="cta ghost" id="back">Retour au menu</button>`;
+    const foot = !cart.length ? `<button type="button" class="cta ghost" id="back">Retour au menu</button>`
+      : outCount ? `<button type="button" class="cta" id="send" disabled>Retirez ${outCount > 1 ? "les articles épuisés" : "l'article épuisé"}</button>`
+      : `<button type="button" class="cta" id="send">Envoyer la commande · ${F(total)}</button>`;
     openSheet(body, foot);
     if (!cart.length) { $("back").onclick = closeSheet; return; }
     $("sheet-body").onclick = (e) => {
@@ -335,7 +363,7 @@
 
   let sending = false;
   async function send() {
-    if (sending || !cart.length) return;
+    if (sending || !cart.length || cart.some((l) => soldOut.has(l.itemId))) return;
     sending = true;
     const btn = $("send"), err = $("cart-err");
     btn.disabled = true; btn.textContent = "Envoi en cours…"; err.hidden = true;
@@ -361,6 +389,12 @@
       btn.textContent = "Réessayer l'envoi";
       if (e.status === 403) setMode("invalid");
       if (e.status === 423) setMode("closed", e.message);   // service fermé entre-temps : le panier est gardé
+      if (e.status === 409) {                                 // un article vient d'être épuisé : on le montre dans le panier
+        await loadSoldOut();
+        openCart();
+        const err2 = $("cart-err");
+        if (err2) { err2.textContent = e.message; err2.hidden = false; }
+      }
     } finally {
       sending = false;
     }
@@ -373,7 +407,8 @@
       <div class="ord-head"><div><div class="ord-no">Commande n° ${o.number}</div><div class="ord-time">Envoyée à ${timeOf(o.createdAt)}</div></div>
         <span class="pill st-${o.status}">${STATUS[o.status]}</span></div>
       ${o.status === "ANNULEE" ? "" : `<ol class="steps"><li class="${step >= 1 ? "done" : ""}">Reçue</li><li class="${step >= 2 ? "done" : ""}">En préparation</li><li class="${step >= 3 ? "done" : ""}">Servie</li></ol>`}
-      <ul>${o.lines.map((l) => `<li>${l.quantity} × ${esc(l.name)}${l.options.length ? ` <small>· ${l.options.map(esc).join(" · ")}</small>` : ""}</li>`).join("")}</ul>
+      <ul>${o.lines.map((l) => `<li>${l.quantity} × ${esc(l.name)}${l.options.length ? ` <small>· ${l.options.map(esc).join(" · ")}</small>` : ""}</li>`).join("")}
+        ${(o.removed || []).map((r) => `<li class="gone">${r.quantity} × ${esc(r.name)} <small>· ${REMOVED[r.reason] || "retiré"}</small></li>`).join("")}</ul>
       <div class="ord-total"><span>Total</span><span>${F(o.total)}</span></div></article>`;
   }
 
@@ -426,10 +461,15 @@
     if (mode !== "order" || !orders.length) return;
     if (document.hidden) { schedulePoll(); return; }
     let changed = false;
+    const removals = [];   // articles retirés par la caisse depuis le dernier passage
     await Promise.all(orders.filter((o) => o.status !== "PAYEE" && o.status !== "ANNULEE").map(async (o) => {
       try {
         const v = await api("/api/orders/" + o.publicId);
-        if (v.status !== o.status) {
+        const before = (o.removed || []).length, after = (v.removed || []).length;
+        if (after > before) {
+          changed = true;
+          removals.push({ order: v, items: v.removed.slice(before) });
+        } else if (v.status !== o.status) {
           changed = true;
           if (v.status === "EN_CUISINE") toast(`Commande n° ${v.number} : en préparation`);
           if (v.status === "SERVIE") toast(`Commande n° ${v.number} : servie, bon appétit !`);
@@ -438,6 +478,13 @@
         Object.assign(o, v);
       } catch (e) { /* réseau momentané : on réessaie au prochain passage */ }
     }));
+    if (removals.length) {
+      save(); updateBar();
+      loadSoldOut();
+      showRemoved(removals);
+      schedulePoll();
+      return;
+    }
     // la caisse a encaissé la table : fin de la visite, le téléphone oublie la table
     if (orders.some((o) => o.status === "PAYEE") && orders.every((o) => o.status === "PAYEE" || o.status === "ANNULEE")) {
       endVisit();
@@ -449,7 +496,31 @@
     }
     schedulePoll();
   }
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) { refreshOrders(); recheck(); } });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { refreshOrders(); recheck(); if (mode === "order") loadSoldOut(); } });
+
+  /** La caisse a retiré un ou plusieurs articles : fiche bien visible, avec le nouveau total. */
+  function showRemoved(removals) {
+    const items = removals.flatMap((r) => r.items);
+    const one = items.length === 1;
+    const why = (r) => r.reason === "EPUISE" ? "n'est plus disponible aujourd'hui" : r.reason === "CLIENT" ? "a été retiré à votre demande" : "a été retiré par le café";
+    const list = items.map((r) => `<li><b>${r.quantity} × ${esc(r.name)}</b><span>${why(r)}</span></li>`).join("");
+    const totals = removals.map(({ order: o }) => o.status === "ANNULEE"
+      ? `<p class="rm-total">Commande n° ${o.number} : <b>annulée</b>, vous n'avez rien à payer pour celle-ci.</p>`
+      : `<p class="rm-total">Commande n° ${o.number} · nouveau total : <b>${F(o.total)}</b></p>`).join("");
+    if (navigator.vibrate) navigator.vibrate([60, 80, 60]);
+    openSheet(`<div class="rm-sheet">
+        <span class="rm-ico" aria-hidden="true">!</span>
+        <h2 class="sh-title" id="sheet-title">${one ? "Un article a été retiré" : "Des articles ont été retirés"}</h2>
+        <p class="sh-sub">Désolé pour ce changement.</p>
+        <ul class="rm-list">${list}</ul>
+        ${totals}
+        <p class="fine">Le reste de votre commande est en préparation. Vous pouvez choisir autre chose dans le menu.</p>
+      </div>`,
+      `<button type="button" class="cta ghost" id="rm-orders">Mes commandes</button>
+       <button type="button" class="cta" id="rm-more">Voir le menu</button>`);
+    $("rm-more").onclick = closeSheet;
+    $("rm-orders").onclick = () => openOrders();
+  }
 
   /** Fin de la visite : on efface la table, le panier et le suivi de ce téléphone. */
   function endVisit() {

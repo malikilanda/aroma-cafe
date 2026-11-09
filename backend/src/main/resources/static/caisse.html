@@ -84,9 +84,15 @@
     <!-- 4. Le panneau de droite : liste des commandes, ou détail d'une commande / d'une table -->
     <aside class="side" id="side">
       <div class="side-list" id="side-list">
-        <div class="seg" role="tablist" aria-label="Commandes">
+        <div class="seg" role="tablist" aria-label="Commandes et carte">
           <button type="button" role="tab" id="tab-todo" aria-selected="true">À traiter <span class="seg-n" id="tab-todo-n">0</span></button>
           <button type="button" role="tab" id="tab-today" aria-selected="false">Aujourd'hui <span class="seg-n" id="tab-today-n">0</span></button>
+          <button type="button" role="tab" id="tab-carte" aria-selected="false">Carte du jour <span class="seg-n" id="tab-carte-n" hidden>0</span></button>
+        </div>
+        <div class="av-search" id="av-search-wrap" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="search" id="av-search" placeholder="Rechercher un article (ex. mangue, latte…)" autocomplete="off" aria-label="Rechercher un article de la carte">
+          <button type="button" id="av-clear" aria-label="Effacer la recherche" hidden>×</button>
         </div>
         <div class="list" id="list" role="tabpanel"></div>
       </div>

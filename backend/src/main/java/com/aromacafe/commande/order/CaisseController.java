@@ -3,6 +3,7 @@ package com.aromacafe.commande.order;
 import com.aromacafe.commande.config.CafeNetwork;
 import com.aromacafe.commande.order.OrderDtos.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -61,6 +62,12 @@ public class CaisseController {
 
     @PostMapping("/orders/{id}/annuler")
     public OrderView cancel(@PathVariable long id) { return service.cancel(id); }
+
+    /** Retire l'article n° index (0 = premier) d'une commande pas encore servie. */
+    @PostMapping("/orders/{id}/lignes/{index}/retirer")
+    public OrderView removeLine(@PathVariable long id, @PathVariable int index, @Valid @RequestBody RemoveLineRequest req) {
+        return service.removeLine(id, index, req);
+    }
 
     // ------------------------------------------------------------------ tables
 

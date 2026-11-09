@@ -168,5 +168,26 @@ textarea.note:focus{outline:none;border-color:var(--ink)}
 .thanks-fine{margin:16px auto 0;max-width:32ch;padding-top:14px;border-top:1px solid var(--line);font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
 @keyframes thanks-pop{from{transform:scale(.4);opacity:0}}
 
+/* ---------- Articles épuisés et articles retirés ---------- */
+.item.orderable:has(.add.out) { cursor: default; }
+.item.orderable:has(.add.out) .name,
+.item.orderable:has(.add.out) .price { opacity: .45; }
+.item.orderable:has(.add.out) .name { text-decoration: line-through; text-decoration-thickness: 1px; }
+.add.out { width: auto; min-width: 0; padding: 0 9px; border-radius: 999px; background: var(--paper-2); color: var(--red); border: 1px solid var(--line); font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.cl.is-out .cl-name { text-decoration: line-through; opacity: .6; }
+.cl-out { display: block; margin-top: 3px; font-size: 12.5px; font-weight: 600; color: var(--red); }
+.ord li.gone { color: var(--ink-soft); text-decoration: line-through; }
+.ord li.gone small { text-decoration: none; display: inline-block; }
+.rm-sheet { text-align: center; padding: 6px 2px 0; }
+.rm-ico { display: grid; place-items: center; width: 56px; height: 56px; margin: 4px auto 8px; border-radius: 50%;
+  background: var(--brush); color: #2A1A12; font-size: 30px; font-weight: 700; line-height: 1;
+  box-shadow: 0 0 0 8px color-mix(in srgb, var(--brush) 22%, transparent); }
+.rm-list { list-style: none; margin: 14px 0 8px; padding: 0; text-align: left; border-top: 1px solid var(--line); }
+.rm-list li { display: flex; flex-direction: column; gap: 2px; padding: 11px 2px; border-bottom: 1px solid var(--line); }
+.rm-list b { font-size: 16px; font-weight: 600; color: var(--ink); }
+.rm-list span { font-size: 14px; color: var(--ink-soft); }
+.rm-total { margin: 10px 0 0; font-size: 15.5px; color: var(--ink); }
+.rm-sheet .fine { margin-top: 12px; }
+
 body.locked{overflow:hidden}
 @media (prefers-reduced-motion:reduce){.sheet,.scrim,.cbar,.toast{transition:none}.bump,.info-banner.done,.thanks-ico{animation:none}}
