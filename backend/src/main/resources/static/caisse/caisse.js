@@ -478,7 +478,8 @@
           return;
         }
         toast(`« ${esc(line.name)} » retiré · nouveau total ${F(v.total)}${v.status === "EN_CUISINE" ? " · prévenez la cuisine" : ""}`);
-        render();                        // détail, montant de la table sur le plan et compteurs
+        renderOrder(v);                  // d'abord le détail : le panneau « Retirer » disparaît…
+        render();                        // …puis le montant de la table sur le plan et les compteurs
       });
       return true;
     }

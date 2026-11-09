@@ -81,6 +81,7 @@ public class CaisseController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void close(@PathVariable int table) { service.close(table); }
 
+    /** Liens des QR codes : {"tables": [{"table": 1, "path": "/?t=1&k=…"}, …]} */
     @GetMapping("/qr")
-    public Map<String, Object> qr() { return Map.of("tables", service.qrLinks()); }
+    public Map<String, Object> qr() { return service.qrLinks(); }
 }
