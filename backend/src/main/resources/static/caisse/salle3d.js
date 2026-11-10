@@ -1,6 +1,8 @@
 /* =====================================================================
    Aroma Café · La salle en 3D (Three.js)
-   - Dessine la salle à partir de caisse/salle.json : sols, murets, comptoir, entrée, tables et chaises.
+   - Dessine la salle à partir de caisse/salle.json : sols, murets, comptoir, canapés, entrée, tables et chaises.
+   - Table « rectangle » : longueur (x) × largeur (z) en mètres, chaises posées côté par côté
+     ({"gauche":1,"droite":2,"avant":0,"arriere":1}), comme sur le vrai plan.
    - Pose sur chaque table une pastille HTML (numéro, montant, pastille rouge) qui suit la 3D.
    - Un halo rouge pulse au sol sous une table qui a une commande à traiter ; ambre pour l'addition.
    - Glisser le doigt fait pivoter un peu la salle ; toucher une table la sélectionne.
@@ -106,7 +108,7 @@ const Salle = (function () {
       g.font = `600 64px Jost, "Segoe UI", sans-serif`;
       g.textAlign = "center"; g.textBaseline = "middle";
       g.fillStyle = color;
-      g.fillText(text.toUpperCase().split("").join("\u200a"), w / 2, h / 2);
+      g.fillText(text.toUpperCase().split("").join(" "), w / 2, h / 2);
     });
     const m = new THREE.Mesh(new THREE.PlaneGeometry(size, size / 4), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false }));
     m.rotation.x = -Math.PI / 2;
@@ -126,6 +128,10 @@ const Salle = (function () {
     MAT.counterTop = new THREE.MeshStandardMaterial({ color: 0xf6eee4, roughness: 0.3 });
     MAT.pot = new THREE.MeshStandardMaterial({ color: 0xb4532a, roughness: 0.8 });
     MAT.leaf = new THREE.MeshStandardMaterial({ color: 0x3f7a3a, roughness: 0.8, flatShading: true });
+    MAT.door = new THREE.MeshStandardMaterial({ color: 0x2a1a12, roughness: 0.6 });
+    MAT.doorLeaf = new THREE.MeshStandardMaterial({ color: 0x7a5236, roughness: 0.55 });
+    MAT.sofa = new THREE.MeshStandardMaterial({ color: 0x6b4a36, roughness: 0.95 });
+    MAT.cushion = new THREE.MeshStandardMaterial({ color: 0x8c6448, roughness: 0.95 });
   }
 
   const shadowed = (m) => { m.castShadow = true; m.receiveShadow = true; return m; };
@@ -153,7 +159,29 @@ const Salle = (function () {
     const places = Math.max(1, Math.min(8, t.places || 2));
     let top, halo, w = 0.8, d = 0.8;
 
-    if (t.forme === "ronde") {
+    if (t.forme === "rectangle") {
+      // table dessinée sur le vrai plan : dimensions et chaises par côté
+      w = t.longueur || 1.2; d = t.largeur || 0.8;
+      top = new THREE.Mesh(new THREE.BoxGeometry(w, 0.05, d), MAT.top);
+      const ch = t.chaises || {};
+      // côté → angle de la chaise, distance au centre, longueur du côté, axe le long duquel on répartit
+      const sides = {
+        avant:   { a: 0,            dist: d / 2 + 0.3, len: w, along: "x" },
+        arriere: { a: Math.PI,      dist: d / 2 + 0.3, len: w, along: "x" },
+        droite:  { a: Math.PI / 2,  dist: w / 2 + 0.3, len: d, along: "z" },
+        gauche:  { a: -Math.PI / 2, dist: w / 2 + 0.3, len: d, along: "z" },
+      };
+      for (const [name, sd] of Object.entries(sides)) {
+        const n = Math.max(0, Math.min(4, ch[name] || 0));
+        for (let i = 0; i < n; i++) {
+          const c = chair(sd.a, sd.dist);
+          const off = (i - (n - 1) / 2) * Math.min(0.62, sd.len / n);
+          if (sd.along === "x") c.position.x += off; else c.position.z += off;
+          g.add(c);
+        }
+      }
+      halo = Math.max(w, d) / 2 + 0.85;
+    } else if (t.forme === "ronde") {
       const r = places <= 2 ? 0.38 : 0.48;
       top = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 0.05, 40), MAT.top);
       for (let i = 0; i < places; i++) g.add(chair((i / places) * Math.PI * 2 + Math.PI / places, r + 0.32));
@@ -237,13 +265,18 @@ const Salle = (function () {
       m.rotation.y = -Math.atan2(z2 - z1, x2 - x1);
       scene.add(m);
     };
-    wall(0, 0, W, 0);
-    wall(0, 0, 0, pd);
-    wall(W, 0, W, pd);
-    if (door) {
-      wall(0, pd, door.x, pd);
-      wall(door.x + (door.largeur || 1.4), pd, W, pd);
-    } else wall(0, pd, W, pd);
+    if (Array.isArray(plan.murs) && plan.murs.length) {
+      // murs dessinés d'après le vrai plan : [x1, z1, x2, z2] en mètres
+      for (const m of plan.murs) wall(m[0], m[1], m[2], m[3]);
+    } else {
+      wall(0, 0, W, 0);
+      wall(0, 0, 0, pd);
+      wall(W, 0, W, pd);
+      if (door) {
+        wall(0, pd, door.x, pd);
+        wall(door.x + (door.largeur || 1.4), pd, W, pd);
+      } else wall(0, pd, W, pd);
+    }
 
     for (const d of plan.decor || []) {
       if (d.type === "comptoir") {
@@ -261,6 +294,62 @@ const Salle = (function () {
       if (d.type === "entree") {
         const l = floorText(d.texte || "Entrée", 1.6, "rgba(255,248,238,.7)");
         l.position.set(d.x + (d.largeur || 1.4) / 2 - W / 2, 0.01, d.z - 0.45 - D / 2);
+        scene.add(l);
+      }
+      if (d.type === "canape") {
+        // assise basse + dossier contre le mur (dos : gauche, droite, avant ou arriere)
+        const cx = d.x + d.largeur / 2 - W / 2, cz = d.z + d.profondeur / 2 - D / 2;
+        const seat = shadowed(new THREE.Mesh(new THREE.BoxGeometry(d.largeur, 0.42, d.profondeur), MAT.sofa));
+        seat.position.set(cx, 0.21, cz);
+        const cush = shadowed(new THREE.Mesh(new THREE.BoxGeometry(d.largeur - 0.08, 0.08, d.profondeur - 0.08), MAT.cushion));
+        cush.position.set(cx, 0.46, cz);
+        scene.add(seat, cush);
+        const dos = d.dos || "arriere", th = 0.18;
+        const vertical = dos === "gauche" || dos === "droite";
+        const back = shadowed(new THREE.Mesh(new THREE.BoxGeometry(vertical ? th : d.largeur, 0.78, vertical ? d.profondeur : th), MAT.sofa));
+        back.position.set(
+          cx + (dos === "gauche" ? -(d.largeur - th) / 2 : dos === "droite" ? (d.largeur - th) / 2 : 0),
+          0.39,
+          cz + (dos === "arriere" ? -(d.profondeur - th) / 2 : dos === "avant" ? (d.profondeur - th) / 2 : 0));
+        scene.add(back);
+      }
+      if (d.type === "porte") {
+        // encadrement + battant ouvert, posés dans le trou d'un muret (le long de x)
+        const L = d.largeur || 1.6, x0 = d.x - W / 2, z0 = d.z - D / 2;
+        const ph = 1.05;
+        for (const px of [x0, x0 + L]) {
+          const post = shadowed(new THREE.Mesh(new THREE.BoxGeometry(0.1, ph, 0.16), MAT.door));
+          post.position.set(px, ph / 2, z0);
+          scene.add(post);
+        }
+        const lintel = shadowed(new THREE.Mesh(new THREE.BoxGeometry(L + 0.1, 0.08, 0.16), MAT.door));
+        lintel.position.set(x0 + L / 2, ph, z0);
+        const leafW = L / 2 - 0.06, side = d.ouverture === "interieur" ? -1 : 1;
+        for (const [hx, dir] of [[x0 + 0.05, 1], [x0 + L - 0.05, -1]]) {
+          // deux battants ouverts à 60°, côté terrasse par défaut
+          const pivot = new THREE.Group();
+          pivot.position.set(hx, 0, z0);
+          pivot.rotation.y = dir * side * -THREE.MathUtils.degToRad(60);
+          const leaf = shadowed(new THREE.Mesh(new THREE.BoxGeometry(leafW, ph - 0.12, 0.05), MAT.doorLeaf));
+          leaf.position.set(dir * leafW / 2, (ph - 0.12) / 2 + 0.02, 0);
+          pivot.add(leaf);
+          scene.add(pivot);
+        }
+        const mat = new THREE.Mesh(new THREE.PlaneGeometry(L * 0.8, 0.6), new THREE.MeshStandardMaterial({ color: 0x3a2a20, roughness: 1 }));
+        mat.rotation.x = -Math.PI / 2;
+        mat.position.set(x0 + L / 2, 0.006, z0 - 0.45 * side);
+        mat.receiveShadow = true;
+        scene.add(lintel, mat);
+      }
+      if (d.type === "chaise") {
+        // chaise seule (terrasse…) : angle = direction du dossier, en degrés (0 = dossier vers l'avant)
+        const c = chair(THREE.MathUtils.degToRad(d.angle || 0), 0);
+        c.position.set(d.x - W / 2, 0, d.z - D / 2);
+        scene.add(c);
+      }
+      if (d.type === "texte") {
+        const l = floorText(d.texte, d.taille || 1.6, d.couleur || "rgba(255,248,238,.7)");
+        l.position.set(d.x - W / 2, 0.01, d.z - D / 2);
         scene.add(l);
       }
       if (d.type === "plante") {
