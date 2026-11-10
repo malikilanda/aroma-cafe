@@ -1,36 +1,50 @@
 {
   "_aide": [
-    "Plan de la salle affiché en 3D sur la caisse. Les mesures sont en mètres, vues du dessus.",
-    "x : de gauche (0) à droite (largeur). z : du fond de la salle (0) vers l'entrée (profondeur).",
-    "forme : ronde, carree ou longue. places : nombre de chaises (1 à 8). angle : rotation en degrés (0, 45, 90…).",
-    "Ajouter une table : copier une ligne de « tables », changer le numéro et la position, puis mettre aroma.tables à jour dans application.properties.",
-    "Une table présente dans application.properties mais absente d'ici est placée automatiquement en bas du plan."
+    "Plan réel d'Aroma Café, vu depuis la caisse (la caisse est devant, la terrasse au fond). Mesures en mètres, vues du dessus.",
+    "x : de gauche (0) à droite (largeur). z : du fond (0, côté terrasse) vers la caisse (profondeur).",
+    "forme « rectangle » : longueur (le long de x) × largeur (le long de z) ; chaises : nombre de chaises par côté (gauche, droite, avant = côté caisse, arriere = côté terrasse).",
+    "murs : liste de murets [x1, z1, x2, z2]. Un trou entre deux murets = une porte.",
+    "Ajouter une table : copier une ligne de « tables », changer le numéro et la position, puis mettre AROMA_TABLES à jour sur Render."
   ],
 
-  "salle": { "largeur": 12, "profondeur": 8 },
+  "salle": {"largeur": 13.2, "profondeur": 9},
 
   "zones": [
-    { "nom": "Salle",    "x": 0, "z": 0, "largeur": 8, "profondeur": 8, "sol": "bois" },
-    { "nom": "Terrasse", "x": 8, "z": 0, "largeur": 4, "profondeur": 8, "sol": "carrelage" }
+    {"nom": "Terrasse", "x": 0, "z": 0, "largeur": 13.2, "profondeur": 1.15, "sol": "carrelage"},
+    {"nom": "Salle", "x": 0, "z": 1.15, "largeur": 13.2, "profondeur": 6.7, "sol": "bois"},
+    {"nom": "", "x": 3.0, "z": 7.85, "largeur": 5.4, "profondeur": 1.15, "sol": "bois"}
+  ],
+
+  "murs": [
+    [0, 0, 13.2, 0],
+    [0, 0, 0, 7.85],
+    [13.2, 0, 13.2, 7.85],
+    [0, 1.15, 4.8, 1.15],
+    [6.8, 1.15, 13.2, 1.15],
+    [0, 7.85, 3.0, 7.85],
+    [3.0, 7.85, 3.0, 9],
+    [3.0, 9, 8.4, 9],
+    [8.4, 9, 8.4, 7.85],
+    [8.4, 7.85, 13.2, 7.85]
   ],
 
   "decor": [
-    { "type": "comptoir", "x": 0.6, "z": 0.3, "largeur": 4.2, "profondeur": 0.8, "texte": "Comptoir" },
-    { "type": "entree",   "x": 3.4, "z": 8,   "largeur": 1.6, "texte": "Entrée" },
-    { "type": "plante",   "x": 7.6, "z": 0.5 },
-    { "type": "plante",   "x": 7.6, "z": 7.5 }
+    {"type": "comptoir", "x": 3.15, "z": 7.95, "largeur": 5.1, "profondeur": 0.8, "texte": "Caisse"},
+    {"type": "canape", "x": 0.11, "z": 2.22, "largeur": 0.82, "profondeur": 5.07, "dos": "gauche"},
+    {"type": "canape", "x": 7.4, "z": 6.88, "largeur": 5.1, "profondeur": 0.89, "dos": "avant"},
+    {"type": "texte", "x": 5.8, "z": 1.6, "texte": "Porte", "taille": 1.4}
   ],
 
   "tables": [
-    { "numero": 1,  "x": 1.4, "z": 2.6, "forme": "ronde",  "places": 2 },
-    { "numero": 2,  "x": 3.4, "z": 2.6, "forme": "ronde",  "places": 2 },
-    { "numero": 3,  "x": 5.6, "z": 2.4, "forme": "carree", "places": 4 },
-    { "numero": 4,  "x": 1.4, "z": 4.8, "forme": "carree", "places": 4 },
-    { "numero": 5,  "x": 3.6, "z": 4.8, "forme": "longue", "places": 6 },
-    { "numero": 6,  "x": 6.2, "z": 5.0, "forme": "carree", "places": 4, "angle": 45 },
-    { "numero": 7,  "x": 1.4, "z": 6.9, "forme": "ronde",  "places": 2 },
-    { "numero": 8,  "x": 9.9, "z": 1.6, "forme": "ronde",  "places": 2 },
-    { "numero": 9,  "x": 9.9, "z": 4.0, "forme": "ronde",  "places": 3 },
-    { "numero": 10, "x": 9.9, "z": 6.4, "forme": "longue", "places": 4, "angle": 90 }
+    {"numero": 1, "x": 1.4, "z": 3.3, "forme": "rectangle", "longueur": 0.6, "largeur": 1.25, "chaises": {"droite": 2}},
+    {"numero": 2, "x": 1.4, "z": 6.2, "forme": "rectangle", "longueur": 0.65, "largeur": 1.2, "chaises": {"droite": 2}},
+    {"numero": 3, "x": 3.7, "z": 3.4, "forme": "rectangle", "longueur": 1.3, "largeur": 0.75, "chaises": {"gauche": 1, "droite": 1, "avant": 2, "arriere": 2}},
+    {"numero": 4, "x": 3.6, "z": 6.0, "forme": "rectangle", "longueur": 0.8, "largeur": 0.8, "chaises": {"droite": 1, "avant": 1, "arriere": 1}},
+    {"numero": 5, "x": 5.8, "z": 6.1, "forme": "rectangle", "longueur": 0.85, "largeur": 0.85, "chaises": {"gauche": 1, "droite": 1, "avant": 1, "arriere": 1}},
+    {"numero": 6, "x": 7.6, "z": 3.0, "forme": "rectangle", "longueur": 0.8, "largeur": 1.35, "chaises": {"gauche": 2, "droite": 2, "avant": 1}},
+    {"numero": 7, "x": 10.4, "z": 3.0, "forme": "rectangle", "longueur": 0.8, "largeur": 1.6, "chaises": {"gauche": 2, "droite": 2, "avant": 1}},
+    {"numero": 8, "x": 7.9, "z": 6.43, "forme": "rectangle", "longueur": 0.65, "largeur": 0.65, "chaises": {"gauche": 1, "arriere": 1}},
+    {"numero": 9, "x": 9.7, "z": 6.38, "forme": "rectangle", "longueur": 0.75, "largeur": 0.75, "chaises": {"arriere": 1}},
+    {"numero": 10, "x": 11.7, "z": 6.41, "forme": "rectangle", "longueur": 1.3, "largeur": 0.7, "chaises": {"arriere": 2}}
   ]
 }
