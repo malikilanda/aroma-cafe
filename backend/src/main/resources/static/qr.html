@@ -79,47 +79,75 @@
     }
     .warn b { display: block; }
 
-    /* ---------- chevalets ---------- */
+    /* ---------- cartes de table (format paysage) ---------- */
     .sheet {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 16px;
-      max-width: 1040px;
+      grid-template-columns: repeat(auto-fill, minmax(min(560px, 100%), 1fr));
+      gap: 18px;
+      max-width: 1180px;
       margin: 0 auto;
       padding: 18px 16px 40px;
     }
     .card {
-      position: relative;
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      grid-template-areas: "qr info" "merci merci";
+      column-gap: 26px;
       align-items: center;
-      text-align: center;
-      padding: 22px 16px 16px;
+      padding: 22px 26px 14px;
       border: 1px dashed #C9B6A2;      /* pointillés = trait de découpe */
-      border-radius: 14px;
+      border-radius: 16px;
       background: var(--paper);
       break-inside: avoid;
     }
-    .logo { width: 150px; height: auto; }
-    .tn { margin: 8px 0 0; font-family: var(--hand); font-size: 50px; line-height: 1; }
-    .qr { width: 160px; height: 160px; margin: 10px 0 8px; padding: 8px; border-radius: 10px; background: #fff; }
+
+    /* gauche : numéro de table + QR */
+    .side-qr { grid-area: qr; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .tn { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--soft); }
+    .tn b { display: block; margin-top: -2px; font-size: 34px; letter-spacing: 0; color: var(--ink); line-height: 1.1; }
+    .qr { width: 190px; height: 190px; padding: 10px; border-radius: 12px; background: #fff; border: 1.5px solid var(--ink); }
     .qr svg { display: block; width: 100%; height: 100%; }
-    .how { margin: 0; font-size: 14px; font-weight: 500; }
-    .how small { display: block; margin-top: 2px; font-weight: 400; color: var(--soft); font-size: 12.5px; }
-    .wifi { margin: 8px 0 0; padding: 4px 10px; border-radius: 999px; background: #F1E7DA; font-size: 12.5px; }
-    .test { margin-top: 10px; font-size: 13px; color: var(--soft); }
-    .test a { color: var(--ink); }
+    .how { margin: 2px 0 0; font-size: 14px; font-weight: 600; text-align: center; }
+    .how small { display: block; font-weight: 400; color: var(--soft); font-size: 12px; }
+
+    /* droite : logo + réseaux sociaux */
+    .side-info { grid-area: info; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+    .logo { width: 210px; max-width: 100%; height: auto; }
+    .follow { margin: 0; font-size: 12.5px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--red); }
+    .socials { margin: 0; padding: 0; list-style: none; display: grid; gap: 9px; }
+    .socials li { display: grid; grid-template-columns: 34px 1fr; align-items: center; gap: 10px; }
+    .ico { display: grid; place-items: center; width: 34px; height: 34px; color: var(--ink); }
+    .ico svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+    .socials span { display: flex; flex-direction: column; line-height: 1.2; }
+    .socials small { font-size: 11.5px; color: var(--soft); letter-spacing: .04em; }
+    .socials b { font-size: 16px; font-weight: 600; }
+    .wifi { margin: 0; align-self: flex-start; padding: 4px 10px; border-radius: 999px; background: #F1E7DA; font-size: 12.5px; }
+
+    /* bas : merci */
+    .merci { grid-area: merci; margin: 10px 0 4px; padding-top: 6px; border-top: 1px solid var(--line); text-align: center; font-family: var(--hand); font-size: 44px; line-height: 1.1; color: var(--ink); }
 
     .err { max-width: 1040px; margin: 18px auto; padding: 14px 16px; border-radius: 12px; background: #FBE1DF; color: #8D1B12; }
 
-    /* ---------- impression : A4, 2 colonnes × 3 lignes ---------- */
+    /* petit écran : QR au-dessus */
+    @media (max-width: 520px) {
+      .card { grid-template-columns: 1fr; grid-template-areas: "qr" "info" "merci"; row-gap: 16px; }
+      .side-info { align-items: center; }
+    }
+
+    /* ---------- impression : A4, 3 cartes paysage par page ---------- */
     @media print {
       @page { size: A4; margin: 10mm; }
       body { background: #fff; }
-      .bar, .warn, .test { display: none !important; }
-      .sheet { grid-template-columns: repeat(2, 1fr); gap: 6mm; max-width: none; padding: 0; margin: 0; }
-      .card { height: 88mm; justify-content: center; padding: 4mm; border-radius: 3mm; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .card:nth-child(6n) { break-after: page; }
+      .bar, .warn { display: none !important; }
+      .sheet { grid-template-columns: 1fr; gap: 6mm; max-width: none; padding: 0; margin: 0; }
+      .card { height: 85mm; overflow: hidden; grid-template-rows: 1fr auto; padding: 5mm 10mm 2mm; border-radius: 3mm; column-gap: 10mm; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .side-qr { gap: 1mm; }
+      .tn b { font-size: 26px; }
+      .qr { width: 44mm; height: 44mm; padding: 2mm; }
+      .side-info { gap: 2.5mm; }
+      .socials { gap: 2mm; }
+      .merci { font-size: 30px; margin-top: 1mm; padding-top: 1mm; }
+      .card:nth-child(3n) { break-after: page; }
     }
   </style>
 </head>
@@ -157,7 +185,20 @@
       get(k, d) { try { return localStorage.getItem(k) || d; } catch (e) { return d; } },
       set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* pas grave */ } },
     };
-    let links = [];   // [{ table: 1, path: "/?t=1&k=…" }, …] fourni par le serveur
+    let links = [];
+
+    /* Réseaux sociaux et contacts imprimés sur chaque carte. */
+    const SOCIAL_LIST = [
+      { label: "Instagram", value: "aroma cafe",
+        icon: '<rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6" fill="currentColor"/>' },
+      { label: "TikTok", value: "aromacafe.tg",
+        icon: '<path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 3c.4 2.6 2.2 4.4 5 4.6"/>' },
+      { label: "Téléphone", value: "+228 22 20 03 03",
+        icon: '<path d="M5 4h3.5l1.5 4-2 1.3a11 11 0 0 0 6.7 6.7l1.3-2 4 1.5V19a1.5 1.5 0 0 1-1.6 1.5A16.5 16.5 0 0 1 3.5 5.6 1.5 1.5 0 0 1 5 4z"/>' },
+      { label: "WhatsApp", value: "+228 70 06 99 99",
+        icon: '<path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.6 18.6z"/><path d="M9.3 8.6c.2 2.6 2.4 5 5.2 5.4l.9-1.2-1.6-.9-.7.7a4 4 0 0 1-2.1-2.1l.7-.7-.9-1.6z"/>' },
+    ];
+    const SOCIALS = SOCIAL_LIST.map((s) => `<li><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24">${s.icon}</svg></span><span><small>${s.label}</small><b>${s.value}</b></span></li>`).join("");   // [{ table: 1, path: "/?t=1&k=…" }, …] fourni par le serveur
 
     $("base").value = store.get("aroma.qr.base", location.origin);
     $("wifi").value = store.get("aroma.qr.wifi", "");
@@ -176,23 +217,50 @@
         q.addData(url);
         q.make();
         return `<article class="card">
-          <img class="logo" src="img/logo.png" alt="Aroma Café" width="720" height="140">
-          <h2 class="tn">Table ${l.table}</h2>
-          <div class="qr" role="img" aria-label="QR code de la table ${l.table}">${q.createSvgTag({ cellSize: 4, margin: 0, scalable: true })}</div>
-          <p class="how">Scannez pour commander<small>Le menu s'ouvre sur votre téléphone</small></p>
-          ${wifi ? `<p class="wifi">Wi-Fi : <b>${wifi.replace(/[<>&]/g, "")}</b></p>` : ""}
-          <p class="test"><a href="${url}" target="_blank" rel="noopener">Tester le lien</a></p>
+          <div class="side-qr">
+            <h2 class="tn">Table<b>${l.table}</b></h2>
+            <div class="qr" role="img" aria-label="QR code de la table ${l.table}">${q.createSvgTag({ cellSize: 4, margin: 0, scalable: true })}</div>
+            <p class="how">Scannez pour commander<small>Le menu s'ouvre sur votre téléphone</small></p>
+          </div>
+          <div class="side-info">
+            <img class="logo" src="img/logo.png" alt="Aroma Café" width="720" height="140">
+            <p class="follow">Suivez-nous</p>
+            <ul class="socials">${SOCIALS}</ul>
+            ${wifi ? `<p class="wifi">Wi-Fi : <b>${wifi.replace(/[<>&]/g, "")}</b></p>` : ""}
+          </div>
+          <p class="merci">Merci de votre visite !</p>
         </article>`;
       }).join("");
+    }
+
+    /** Affiche un message d'erreur précis à la place des QR codes. */
+    function fail(msg) {
+      const el = $("sheet");
+      if (el) el.outerHTML = '<p class="err">' + msg + '</p>';
     }
 
     fetch("/api/caisse/qr", { cache: "no-store" })
       .then((r) => {
         if (r.status === 401) { location.href = "/login.html"; throw null; }
+        if (!r.ok) throw new Error("Le serveur a répondu " + r.status + ".");
         return r.json();
       })
-      .then((d) => { links = d.tables; draw(); })
-      .catch((e) => { if (e !== null) $("sheet").outerHTML = '<p class="err">Impossible de charger les liens des tables. Vérifiez que le serveur tourne, puis rechargez la page.</p>'; });
+      .then((d) => {
+        // accepte {"tables":[…]} et l'ancienne forme {"tables":{"tables":[…]}}
+        let list = d && d.tables;
+        if (list && !Array.isArray(list) && Array.isArray(list.tables)) list = list.tables;
+        if (!Array.isArray(list)) throw new Error("Réponse du serveur inattendue.");
+        if (typeof qrcode !== "function") {
+          fail("Le dessin des QR codes n'a pas pu se charger (connexion internet ou bloqueur de publicité). Désactivez le bloqueur sur cette page, puis rechargez.");
+          throw null;
+        }
+        links = list;
+        draw();
+      })
+      .catch((e) => {
+        if (e === null) return;
+        fail("Impossible de charger les liens des tables. " + (e && e.message ? e.message + " " : "") + "Rechargez la page ; si le problème continue, envoyez ce message.");
+      });
 
     $("go").onclick = draw;
     $("base").addEventListener("keydown", (e) => { if (e.key === "Enter") draw(); });
